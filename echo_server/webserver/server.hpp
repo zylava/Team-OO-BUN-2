@@ -14,7 +14,6 @@
 #include <boost/asio.hpp>
 #include <string>
 #include "connection.hpp"
-#include "request_handler.hpp"
 
 namespace http {
 namespace server {
@@ -53,8 +52,6 @@ private:
   /// The next socket to be accepted.
   boost::asio::ip::tcp::socket socket_;
 
-  /// The handler for all incoming requests.
-  request_handler request_handler_;
 };
 
 } // namespace server
