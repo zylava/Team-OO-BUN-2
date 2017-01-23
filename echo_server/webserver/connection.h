@@ -16,29 +16,19 @@ public:
   connection(const connection&) = delete;
   connection& operator=(const connection&) = delete;
 
-  explicit connection(boost::asio::ip::tcp::socket socket,
-      connection_manager& manager, request_handler& handler);
-
-  /// Start the first asynchronous operation for the connection.
   void start();
 
-  /// Stop all asynchronous operations associated with the connection.
   void stop();
 
 private:
-  /// Perform an asynchronous read operation.
   void do_read();
 
-  /// Perform an asynchronous write operation.
   void do_write();
 
-  /// Socket for the connection.
   boost::asio::ip::tcp::socket socket_;
 
-  /// Buffer for incoming data.
   std::array<char, 8192> buffer_;
 
-  /// The reply to be sent back to the client.
   std::string reply_;
 };
 
