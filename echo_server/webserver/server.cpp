@@ -20,7 +20,7 @@ server::server(const std::string& address, const std::string& port,
   : io_service_(),
     signals_(io_service_),
     acceptor_(io_service_),
-    socket_(io_service_),
+    socket_(io_service_)
 {
   // Register to handle the signals that indicate when the server should exit.
   // It is safe to register for the same signal multiple times in a program,
