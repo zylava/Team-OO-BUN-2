@@ -10,7 +10,7 @@ server::server(const std::string& address, const std::string& port,
   : io_service_(),
     signals_(io_service_),
     acceptor_(io_service_),
-    socket_(io_service_),
+    socket_(io_service_)
 {
 
   do_await_stop();

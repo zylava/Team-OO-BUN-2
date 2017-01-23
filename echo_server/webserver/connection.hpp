@@ -1,5 +1,5 @@
-#ifndef ECHO_SERVER_H
-#define ECHO_SERVER_H
+#ifndef CONNECTION_H
+#define CONNECTION_H
 
 #include <array>
 #include <memory>
@@ -15,6 +15,8 @@ class connection
 public:
   connection(const connection&) = delete;
   connection& operator=(const connection&) = delete;
+
+  explicit connection(boost::asio::ip::tcp::socket socket);
 
   void start();
 
