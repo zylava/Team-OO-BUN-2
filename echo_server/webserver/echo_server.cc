@@ -14,7 +14,7 @@ int sum {
 }
 
 int subtract {
-
+	cout << "A - b is over 9000" << endl;
 }
 
 int multiply {
