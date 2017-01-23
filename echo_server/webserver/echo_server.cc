@@ -8,3 +8,15 @@ int main {
 	cout << "Rishub" << endl;
 
 }
+
+int sum {
+
+}
+
+int subtract {
+
+}
+
+int multiply {
+
+}
