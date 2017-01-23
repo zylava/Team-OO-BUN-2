@@ -10,11 +10,13 @@ int main {
 }
 
 int sum {
-
+	int x = 1;
+	int y = 1;
+	return x + y;
 }
 
 int subtract {
-
+	cout << "A - b is over 9000" << endl;
 }
 
 float multiply (float a, float b) {
