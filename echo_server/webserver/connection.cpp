@@ -35,7 +35,7 @@ void connection::do_read_and_write()
           const std::string content_type = "Content-Type: text/plain\r\n";
 
           // We will be using 'response' to hold the input, a vector of type
-          // const_buffer since async_write requires a type buffer
+          // const_buffer since async_write requires a type buffer 
           std::vector<boost::asio::const_buffer> response;
 
           response.push_back(boost::asio::buffer(okay_reponse));
