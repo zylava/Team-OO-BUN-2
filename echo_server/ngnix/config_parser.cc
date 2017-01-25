@@ -152,7 +152,12 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
   config_stack.push(config);
   TokenType last_token_type = TOKEN_TYPE_START;
   TokenType token_type;
+<<<<<<< HEAD
   int braceNum = 0; 
+=======
+
+  int incomplete_blocks = 0;
+>>>>>>> master
 
   while (true) {
     std::string token;
@@ -192,25 +197,39 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
         break;
       }
     } else if (token_type == TOKEN_TYPE_START_BLOCK) {
+<<<<<<< HEAD
       
       braceNum++; // increments when encountering a starting brace
+=======
+      incomplete_blocks++;
+>>>>>>> master
       if (last_token_type != TOKEN_TYPE_NORMAL) {
         // Error.
         break;
       }
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
       NginxConfig* const new_config = new NginxConfig;
       config_stack.top()->statements_.back().get()->child_block_.reset(
           new_config);
       config_stack.push(new_config);
     } else if (token_type == TOKEN_TYPE_END_BLOCK) {
+<<<<<<< HEAD
       
       braceNum--; // decrements when encountering an ending brace
+=======
+>>>>>>> master
       if (last_token_type != TOKEN_TYPE_STATEMENT_END) {
         // Error.
         break;
       }
+<<<<<<< HEAD
 
+=======
+      incomplete_blocks--;
+>>>>>>> master
       config_stack.pop();
     } else if (token_type == TOKEN_TYPE_EOF) {
       if (last_token_type != TOKEN_TYPE_STATEMENT_END &&
@@ -218,9 +237,15 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
         // Error.
         break;
       }
+<<<<<<< HEAD
       if(braceNum % 2 != 0){
         //Error: uneven number of braces
         break; 
+=======
+      if (incomplete_blocks!=0){
+        //Error.
+        break;
+>>>>>>> master
       }
       return true;
     } else {
@@ -230,11 +255,14 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
     last_token_type = token_type;
   }
 
+<<<<<<< HEAD
   if(braceNum % 2 != 0 && last_token_type == TOKEN_TYPE_END_BLOCK){
       printf ("Uneven amount of braces\n"); 
       return false;
   }
 
+=======
+>>>>>>> master
   printf ("Bad transition from %s to %s\n",
           TokenTypeAsString(last_token_type),
           TokenTypeAsString(token_type));

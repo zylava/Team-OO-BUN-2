@@ -13,7 +13,11 @@ server::server(const std::string& address, const std::string& port,
     socket_(io_service_)
 {
 
+<<<<<<< HEAD
   // do_await_stop();
+=======
+  do_await_stop();
+>>>>>>> master
 
   boost::asio::ip::tcp::resolver resolver(io_service_);
   boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
@@ -40,16 +44,20 @@ void server::do_accept()
           return;
         }
 
+<<<<<<< HEAD
         if (!ec)
         {
           // Creates a shared connection ptr and calls start on it
           std::make_shared<connection>(std::move(socket_))->start();
         }
 
+=======
+>>>>>>> master
         do_accept();
       });
 }
 
+<<<<<<< HEAD
 // void server::do_await_stop()
 // {
 //   signals_.async_wait(
@@ -58,6 +66,16 @@ void server::do_accept()
 //         acceptor_.close();
 //       });
 // }
+=======
+void server::do_await_stop()
+{
+  signals_.async_wait(
+      [this](boost::system::error_code /*ec*/, int /*signo*/)
+      {
+        acceptor_.close();
+      });
+}
+>>>>>>> master
 
 } // namespace server
 } // namespace http

@@ -23,9 +23,15 @@ public:
   void stop();
 
 private:
+<<<<<<< HEAD
   void do_read_and_write();
 
   //void do_write();
+=======
+  void do_read();
+
+  void do_write();
+>>>>>>> master
 
   boost::asio::ip::tcp::socket socket_;
 
