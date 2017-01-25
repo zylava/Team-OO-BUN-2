@@ -5,24 +5,24 @@ Implementation of the echo server was done using the Boost Documentation Example
 
 ## Usage
 
-1. Clone the repository:
+Clone the repository:
 ```
 git clone --recursive https://github.com/UCLA-CS130/Team-OO-BUN-2.git
 ```
-2. Change directory into the webserver directory
+Change directory into the webserver directory
 ```
 cd Team-OO-BUN-2/echo_server/webserver/
 ```
 
-3. Make
+Make
 ```
 make
 ```
 
-4. Rune the server
+Run the server
 ```
 ./webserver <config>
 ```
 Our default <config> file is called `config`
 
-5. Open browser (Chrome, Firefox, etc.) and go to localhost:<port>. Note that the config file defines the port number as `8080`
+Open browser (Chrome, Firefox, etc.) and go to localhost:<port>. Note that the config file defines the port number as `8080`
