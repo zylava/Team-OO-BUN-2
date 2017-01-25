@@ -25,8 +25,6 @@ public:
 private:
   void do_read_and_write();
 
-  //void do_write();
-
   boost::asio::ip::tcp::socket socket_;
 
   std::array<char, 8192> buffer_;
