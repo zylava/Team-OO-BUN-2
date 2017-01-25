@@ -1,10 +1,7 @@
 #include "connection.hpp"
 #include <utility>
 #include <vector>
-<<<<<<< HEAD
 #include <iostream> 
-=======
->>>>>>> master
 
 namespace http {
 namespace server {
@@ -16,11 +13,7 @@ connection::connection(boost::asio::ip::tcp::socket socket)
 
 void connection::start()
 {
-<<<<<<< HEAD
   do_read_and_write();
-=======
-  do_read();
->>>>>>> master
 }
 
 void connection::stop()
@@ -28,11 +21,7 @@ void connection::stop()
   socket_.close();
 }
 
-<<<<<<< HEAD
 void connection::do_read_and_write()
-=======
-void connection::do_read()
->>>>>>> master
 {
   auto self(shared_from_this());
   socket_.async_read_some(boost::asio::buffer(buffer_),
@@ -40,7 +29,6 @@ void connection::do_read()
       {
         if (!ec)
         {
-<<<<<<< HEAD
           // HTTP OK response
           const std::string okay_reponse = "HTTP/1.1 200 OK\r\n";
           // Content type string
@@ -74,32 +62,10 @@ void connection::do_read()
                     ignored_ec);
                 }
               });
-=======
-        	// reply_.append(buffer_.data(), bytes_transferred);
->>>>>>> master
         }
       });
 }
 
-<<<<<<< HEAD
-=======
-void connection::do_write()
-{
-  auto self(shared_from_this());
-  // boost::asio::async_write(socket_, reply_.to_buffers(),
-  //     [this, self](boost::system::error_code ec, std::size_t)
-  //     {
-  //       if (!ec)
-  //       {
-  //         // Initiate graceful connection closure.
-  //         boost::system::error_code ignored_ec;
-  //         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both,
-  //           ignored_ec);
-  //       }
-        
-  //     });
-}
->>>>>>> master
 
 } // namespace server
 } // namespace http

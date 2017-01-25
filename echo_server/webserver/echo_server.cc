@@ -25,12 +25,7 @@ int main(int argc, char* argv[]) {
     string("\\1")
     );
 
-<<<<<<< HEAD
   http::server::server s("localhost", port_number, ".");
-=======
-
-  http::server::server s("localhost", port_number, "index.html");
->>>>>>> master
   s.run();
   return 0;
 }

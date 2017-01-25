@@ -1,8 +1,4 @@
 
 server {
-<<<<<<< HEAD
 	listen 1080;
-=======
-	listen 80;
->>>>>>> master
 }
