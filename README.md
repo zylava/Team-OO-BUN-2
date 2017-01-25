@@ -23,6 +23,6 @@ Run the server
 ```
 ./webserver <config>
 ```
-Our default <config> file is called `config`
+Our default `<config>` file is called `config`
 
-Open browser (Chrome, Firefox, etc.) and go to localhost:<port>. Note that the config file defines the port number as `8080`
+Open browser (Chrome, Firefox, etc.) and go to `localhost:<port>`. Note that the config file defines the port number as `8080`
