@@ -3,7 +3,7 @@
 #include "server.hpp"
 
 TEST(ServerTest, RunTest) {
-	http::server::server s("localhost", "3000", ".");
+	// http::server::server s("localhost", "3000", ".");
 
 	EXPECT_TRUE(true);
 }
