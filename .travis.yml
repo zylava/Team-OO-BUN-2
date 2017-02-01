@@ -5,6 +5,6 @@ sudo: required
 dist: trusty
 os: linux
 addons:
-	apt:
-		packages:
-		- libboost-all-dev
+  apt:
+    packages:
+      - libboost-all-dev
