@@ -1,0 +1,10 @@
+language: cpp
+script: make test
+compiler: gcc
+sudo: required
+dist: trusty
+os: linux
+addons:
+	apt:
+		packages:
+		- libboost-all-dev
