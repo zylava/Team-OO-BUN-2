@@ -1,0 +1,74 @@
+        -:    0:Source:connection.cpp
+        -:    0:Programs:2
+        -:    1:#include "connection.hpp"
+        -:    2:#include <utility>
+        -:    3:#include <vector>
+        -:    4:#include <iostream> 
+        -:    5:
+        -:    6:namespace http {
+        -:    7:namespace server {
+        -:    8:
+    #####:    9:connection::connection(boost::asio::ip::tcp::socket socket)
+    #####:   10:  : socket_(std::move(socket))
+        -:   11:{
+    #####:   12:}
+        -:   13:
+    #####:   14:void connection::start()
+        -:   15:{
+    #####:   16:  do_read();
+    #####:   17:}
+        -:   18:
+    #####:   19:void connection::stop()
+        -:   20:{
+    #####:   21:  socket_.close();
+    #####:   22:}
+        -:   23:
+    #####:   24:int connection::getServerStatus()
+        -:   25:{
+    #####:   26:  return serverStatus; 
+        -:   27:}
+        -:   28:
+    #####:   29:void connection::do_read()
+        -:   30:{
+    #####:   31:  auto self(shared_from_this());
+    #####:   32:  socket_.async_read_some(boost::asio::buffer(buffer_),
+    #####:   33:      [this, self](boost::system::error_code ec, std::size_t bytes_transferred)
+        -:   34:      {
+    #####:   35:        if (!ec)
+        -:   36:        {
+        -:   37:          // Appends the bytes read by async_read_some to the 'reply_' string
+    #####:   38:          reply_.append(buffer_.data(), bytes_transferred);
+    #####:   39:          if (reply_.substr(reply_.size() - 4, 4) == "\r\n\r\n")
+        -:   40:          {
+        -:   41:            // HTTP response and content type
+        -:   42:            // Send back a 200 (OK) code and plain text type
+    #####:   43:            const char* response_string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+        -:   44:
+        -:   45:            // We will be using 'response' to hold the request data from the user
+    #####:   46:            std::string response;
+    #####:   47:            response.append(reply_);
+        -:   48:
+        -:   49:            // Cast the string into a char* as boost::asio::write requires a char*
+        -:   50:            // and the length of what char* points to (we use strlen for this)
+    #####:   51:            const char* reply_body = response.c_str();
+        -:   52:            
+    #####:   53:            write_response(response_string, reply_body); 
+        -:   54:          }
+        -:   55:          else
+        -:   56:          {
+    #####:   57:            serverStatus = -1; 
+    #####:   58:            stop(); 
+        -:   59:          }
+        -:   60:        }
+    #####:   61:      });
+    #####:   62:}
+        -:   63:
+    #####:   64:void connection::write_response(const char* response, const char* reply)
+        -:   65:{
+    #####:   66:  boost::asio::write(socket_, boost::asio::buffer(response, strlen(response)));
+    #####:   67:  boost::asio::write(socket_, boost::asio::buffer(reply, strlen(reply)));
+    #####:   68:  serverStatus = 1; // success
+    #####:   69:}
+        -:   70:
+        -:   71:} // namespace server
+        3:   72:} // namespace http

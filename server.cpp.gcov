@@ -1,0 +1,60 @@
+        -:    0:Source:server.cpp
+        -:    0:Programs:2
+        -:    1:#include "server.hpp"
+        -:    2:#include <signal.h>
+        -:    3:#include <utility>
+        -:    4:
+        -:    5:namespace http {
+        -:    6:namespace server {
+        -:    7:
+    #####:    8:server::server(const std::string& address, const std::string& port,
+        -:    9:    const std::string& doc_root)
+        -:   10:  : io_service_(),
+        -:   11:    signals_(io_service_),
+        -:   12:    acceptor_(io_service_),
+    #####:   13:    socket_(io_service_)
+        -:   14:{
+        -:   15:
+    #####:   16:  boost::asio::ip::tcp::resolver resolver(io_service_);
+    #####:   17:  boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
+    #####:   18:  acceptor_.open(endpoint.protocol());
+    #####:   19:  acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    #####:   20:  acceptor_.bind(endpoint);
+    #####:   21:  acceptor_.listen();
+        -:   22:
+    #####:   23:  do_accept();
+    #####:   24:}
+        -:   25:
+    #####:   26:void server::run()
+        -:   27:{
+    #####:   28:  isRunning = true; 
+    #####:   29:  io_service_.run();
+    #####:   30:}
+        -:   31:
+    #####:   32:void server::do_accept()
+        -:   33:{
+        -:   34:  acceptor_.async_accept(socket_,
+    #####:   35:      [this](boost::system::error_code ec)
+        -:   36:      {
+    #####:   37:        if (!acceptor_.is_open())
+        -:   38:        {
+    #####:   39:          return;
+        -:   40:        }
+        -:   41:
+    #####:   42:        if (!ec)
+        -:   43:        {
+        -:   44:          // Creates a shared connection ptr and calls start on it
+    #####:   45:          std::make_shared<connection>(std::move(socket_))->start();
+        -:   46:        }
+        -:   47:
+    #####:   48:        do_accept();
+    #####:   49:      });
+    #####:   50:}
+        -:   51:
+    #####:   52:bool server::getStatus() 
+        -:   53:{
+    #####:   54:  return isRunning; 
+        -:   55:}
+        -:   56:
+        -:   57:} // namespace server
+        3:   58:} // namespace http
