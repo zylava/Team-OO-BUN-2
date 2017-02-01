@@ -17,12 +17,12 @@ public:
   explicit server(const std::string& address, const std::string& port,
       const std::string& doc_root);
 
-  void run();
+  void run(); 
+  bool getStatus(); 
+  void stop();
 
 private:
   void do_accept();
-
-  void do_await_stop();
 
   boost::asio::io_service io_service_;
 
@@ -31,6 +31,8 @@ private:
   boost::asio::ip::tcp::acceptor acceptor_;
 
   boost::asio::ip::tcp::socket socket_;
+
+  bool isRunning = false;
 
 };
 

@@ -13,8 +13,6 @@ server::server(const std::string& address, const std::string& port,
     socket_(io_service_)
 {
 
-  // do_await_stop();
-
   boost::asio::ip::tcp::resolver resolver(io_service_);
   boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
   acceptor_.open(endpoint.protocol());
@@ -27,6 +25,7 @@ server::server(const std::string& address, const std::string& port,
 
 void server::run()
 {
+  isRunning = true; 
   io_service_.run();
 }
 
@@ -50,14 +49,10 @@ void server::do_accept()
       });
 }
 
-// void server::do_await_stop()
-// {
-//   signals_.async_wait(
-//       [this](boost::system::error_code /*ec*/, int /*signo*/)
-//       {
-//         acceptor_.close();
-//       });
-// }
+bool server::getStatus() 
+{
+  return isRunning; 
+}
 
 } // namespace server
 } // namespace http

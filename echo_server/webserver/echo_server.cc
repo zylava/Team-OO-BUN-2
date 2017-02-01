@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
   NginxConfig config;
   config_parser.Parse(argv[1], &config);
 
+  //parses the config file for the port number 
   string parse_string = config.ToString().c_str();
   string port_number = boost::regex_replace(
     parse_string,

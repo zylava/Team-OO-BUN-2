@@ -22,14 +22,20 @@ public:
 
   void stop();
 
+  int getServerStatus(); 
+
+  void write_response(const char* m, const char* n); 
+  
 private:
-  void do_read_and_write();
+  void do_read();
 
   boost::asio::ip::tcp::socket socket_;
 
   std::array<char, 8192> buffer_;
 
   std::string reply_;
+
+  int serverStatus; // 1 success 0 unsuccessful -1 error
 };
 
 typedef std::shared_ptr<connection> connection_ptr;
