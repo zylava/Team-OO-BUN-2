@@ -25,4 +25,19 @@ Run the server
 ```
 Our default `<config>` file is called `config`
 
-Open browser (Chrome, Firefox, etc.) and go to `localhost:<port>`. Note that the config file defines the port number as `8080`
+Open browser (Chrome, Firefox, etc.) and go to `localhost:<port>`. ss
+
+## Run Unit Tests
+```
+make test
+```
+
+## Integration Test
+```
+./integration_test.sh
+```
+
+## Test Coverage
+```
+./coverage_test.sh
+```
