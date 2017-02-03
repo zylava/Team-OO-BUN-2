@@ -23,6 +23,6 @@ TEST(ServerTest, CorrectInfoTest) {
 }
 
 TEST(ServerTest, MockTest) {
-	MockConnection mock_connection(std::move(socket_));
+	//MockConnection mock_connection(std::move(socket_));
 	EXPECT_TRUE(true);
 }

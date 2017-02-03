@@ -13,8 +13,8 @@ class MockConnection : public http::server::connection
 {
 	public: 
 		//MockConnection() : connection(socket_) {}
-		virtual ~MockConnection() {} 
-		explicit MockConnection(boost::asio::ip::tcp::socket& socket_) : connection(socket_) {}
+		//virtual ~MockConnection() {} 
+		//explicit MockConnection(boost::asio::ip::tcp::socket& socket_) : connection(socket_) {}
 		MOCK_METHOD0(start, void()); 
 		MOCK_METHOD0(stop, void()); 
 		MOCK_METHOD0(do_read, void()); 
