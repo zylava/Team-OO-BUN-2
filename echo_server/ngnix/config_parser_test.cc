@@ -10,7 +10,6 @@ TEST(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
-<<<<<<< HEAD
 TEST(NginxConfigParserTest, UnevenBraces){
 	NginxConfigParser parser; 
 	NginxConfig out_config; 
@@ -38,7 +37,7 @@ TEST_F(NginxConfigFixtureTest, ServerName) {
 	EXPECT_TRUE(ParseString("server_name foo.com;"));
 	EXPECT_EQ("foo.com", out_config_.statements_.at(0)->tokens_.at(1));
 }
-=======
+
 class ConfigStringTest : public ::testing::Test {
 protected:
 	bool ParseString(const std::string config_string) {
@@ -74,6 +73,3 @@ TEST(NginxConfigParserTest, MissingBrace) {
 
   EXPECT_FALSE(success);
 }
-
-
->>>>>>> master
