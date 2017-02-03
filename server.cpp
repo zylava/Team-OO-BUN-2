@@ -3,6 +3,7 @@
 #include <utility>
 #include <string>
 #include <iostream>
+#include <boost/bind.hpp>
 
 namespace http {
 namespace server {
@@ -21,13 +22,13 @@ namespace server {
       address_ = address;
       fileName_ = doc_root; 
 
-      signals_.add(SIGINT);
-      signals_.add(SIGTERM);
-      #if defined(SIGQUIT)
-      signals_.add(SIGQUIT);
-      #endif // defined(SIGQUIT)
+      // signals_.add(SIGINT);
+      // signals_.add(SIGTERM);
+      // #if defined(SIGQUIT)
+      // signals_.add(SIGQUIT);
+      // #endif // defined(SIGQUIT)
 
-       do_await_stop();
+      //do_await_stop();
 
       do_accept();
     }
@@ -40,23 +41,33 @@ namespace server {
 
     void server::do_accept()
     {
-      acceptor_.async_accept(socket_, 
-        [this](boost::system::error_code ec){
-          // error check, if the website name given is not valid then this will return
-          if (!acceptor_.is_open()) {
-            return;
-          }
+      acceptor_.async_accept(socket_, boost::bind(&server::create_connection, this, _1));
+    }
 
-          // if accept handle did not detect any problems with creating then start the connection
-          if (!ec) {
-            // Creates a shared connection ptr and calls start on it
-            // std::move gets rid of the copy constructor delete error
-            auto my_connection = std::make_shared<connection> (std::move(socket_));
-            my_connection->start(); 
-          }
+    bool server::create_connection(const boost::system::error_code& ec) 
+    {
+      // Error check, if the website name given is not valid then this will return
+      if (!acceptor_.is_open()) 
+      {
+        return false;
+      }
 
-          //do_accept();
-        });
+      if (ec) 
+      {
+        return false;
+      }
+      else // If no detected problems with creating then start the connection
+      {
+        // For testing 
+        isRunning = true;
+        
+        // Creates a shared connection ptr and calls start on it
+        // std::move gets rid of the copy constructor delete error
+        std::make_shared<connection>(std::move(socket_))->start();
+      }
+      
+      do_accept();
+      return true;
     }
 
     bool server::getStatus() 
@@ -64,15 +75,18 @@ namespace server {
       return isRunning; 
     }
 
-    std::string server::getPortNum(){
+    std::string server::getPortNum()
+    {
       return portNum_; 
     }
 
-    std::string server::getAddress(){
+    std::string server::getAddress()
+    {
       return address_;
     }
 
-    std::string server::getFileName(){
+    std::string server::getFileName()
+    {
       return fileName_;
     }
 

@@ -2,7 +2,7 @@
 #include <stdio.h>
 using namespace std;
 
-#include "../ngnix/config_parser.h"
+#include "ngnix/config_parser.h"
 #include <boost/regex.hpp>
 #include <boost/asio.hpp>
 #include "server.hpp"
@@ -26,7 +26,12 @@ int main(int argc, char* argv[]) {
     string("\\1")
     );
 
-  http::server::server s("localhost", port_number, "");
+  if (stoi(port_number) < 0 || stoi(port_number) > 65535) {
+    std::cerr << "Error: Port number not in range [0:65535].\n";
+    return false;
+  }
+
+  http::server::server s("localhost", port_number, ".");
   s.run();
   return 0;
 }
