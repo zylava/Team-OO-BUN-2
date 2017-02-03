@@ -2,33 +2,52 @@
 #include "connection.hpp"
 #include "gmock/gmock.h"
 #include <boost/asio.hpp>
-//#include "mock_connection.h"
-
-TEST(ConnectionTest, SimpleTest) {
-
-  // boost::asio::io_service io_service_;
-  // boost::asio::ip::tcp::socket socket_(io_service_);
-  // socket_.open(boost::asio::ip::tcp::v4());
-
-  // const char* response_string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
-  // const char* reply_string = "GET index.html"; 
-
-  // std::make_shared<http::server::connection>(std::move(socket_))-> start();
-  // std::make_shared<http::server::connection>(std::move(socket_))-> write_response(response_string, reply_string);
-
-  // EXPECT_EQ(1,  std::make_shared<http::server::connection>(std::move(socket_))-> getServerStatus());	
-
-  //http::server::connection con(socket_);
-  // con.start();
-  // http::server::connection start(); 
+#include "server.hpp"
 
 
+TEST(ConnectionTest, StatusTest) {
+  boost::asio::io_service io_service_;
+  boost::asio::ip::tcp::socket socket_(io_service_);
 
-  // con.write_response(response_string, reply_string);
-  //http::server::connection write_response(response_string, reply_string); 
- 
+  socket_.open(boost::asio::ip::tcp::v4());
 
-  EXPECT_TRUE(true);
+  auto my_connection = std::make_shared<http::server::connection>(std::move(socket_));
+  my_connection->start(); 
 
+  EXPECT_EQ(1, my_connection->getConnectionStatus()); 
+}
 
+TEST(ConnectionTest, ResponseHeaderTest) {
+
+  boost::asio::io_service io_service_;
+  boost::asio::ip::tcp::socket socket_(io_service_);
+
+  const char* response_string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+
+  std::string request = "GET /index.html HTTP/1.1";
+
+  std::shared_ptr<http::server::connection> con = std::make_shared<http::server::connection>(std::move(socket_));
+  con->construct_response(request);
+
+  const char* response = con->get_response();
+
+  EXPECT_EQ(*response_string, *response);
+  EXPECT_EQ(strlen(response_string), strlen(response)); 
+}
+
+TEST(ConnectionTest, ReplyBodyTest) {
+
+  boost::asio::io_service io_service_;
+  boost::asio::ip::tcp::socket socket_(io_service_);
+
+  std::string request = "GET /index.html HTTP/1.1\r\nHost: localhost:1080";
+
+  auto con = std::make_shared<http::server::connection>(std::move(socket_));
+  con->construct_response(request);
+
+  const char* response = con->get_reply();
+  const char* response_string = request.c_str();
+  
+  EXPECT_EQ(*response_string, *(response));  
+  EXPECT_EQ(strlen(response_string), strlen(response));
 }
