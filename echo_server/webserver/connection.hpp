@@ -9,12 +9,12 @@
 namespace http {
 namespace server {
 
-class connection
-  : public std::enable_shared_from_this<connection>
+class connection : public std::enable_shared_from_this<connection>
 {
 public:
-  connection(const connection&) = delete;
-  connection& operator=(const connection&) = delete;
+  // Does not allow us to make copies of this class
+  // connection(const connection&) = delete;
+  // connection& operator=(const connection&) = delete;
 
   explicit connection(boost::asio::ip::tcp::socket socket);
 
@@ -22,12 +22,20 @@ public:
 
   void stop();
 
-  int getServerStatus(); 
+  const char* get_response();
 
-  void write_response(const char* m, const char* n); 
+  const char* get_reply();
+  
+  int getConnectionStatus(); 
+
+  void construct_response(std::string reply);
+  
+  void write_response();
   
 private:
   void do_read();
+
+  boost::asio::io_service io_service_;
 
   boost::asio::ip::tcp::socket socket_;
 
@@ -35,7 +43,11 @@ private:
 
   std::string reply_;
 
-  int serverStatus; // 1 success 0 unsuccessful -1 error
+  const char* response_header;
+
+  std::string reply_body;
+
+  int connectionStatus; // 1 success 0 unsuccessful -1 error
 };
 
 typedef std::shared_ptr<connection> connection_ptr;
