@@ -9,15 +9,19 @@ echo ""
 
 ./webserver test_config & PID=$!
 
-# curl http://localhost:8080
 
-response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
-echo "HTTP response code is $response"
+# response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
+# echo "HTTP response code is $response"
 
-content_type=$(curl -s -o /dev/null -w "%{content_type}" http://localhost:8080)
-echo "Content Type is $content_type"
+# content_type=$(curl -s -o /dev/null -w "%{content_type}" http://localhost:8080)
+# echo "Content Type is $content_type"
+
+
+
 
 echo ""
+
+kill $PID
 
 if [ $response == "200" ] && [ $content_type == "text/plain" ]; then
 	echo "Success with exit code $?"
@@ -25,4 +29,3 @@ else
 	echo "Fail with exit code $?"
 fi
 
-kill $PID

@@ -20,6 +20,8 @@ int main(int argc, char* argv[]) {
 
   string port_number = "";
   string static_root = "";
+  string echo_handler = "";
+  string static_handler = "";
 
   for (const auto& statement : config.statements_) {
     for (unsigned int i = 0; i < statement->tokens_.size(); ++i) {
@@ -28,6 +30,7 @@ int main(int argc, char* argv[]) {
         port_number = statement->tokens_[i+1];
 
       else if (statement->tokens_[i]=="path" && statement->tokens_[i+1]=="/static"){
+        static_handler = statement->tokens_[i+2];
         std::vector<std::shared_ptr<NginxConfigStatement>> statements = 
                                 statement->child_block_->statements_;
         for (unsigned int j = 0; j < statements.size(); ++j) {
@@ -39,7 +42,7 @@ int main(int argc, char* argv[]) {
       }
 
       else if (statement->tokens_[i]=="path" && statement->tokens_[i+1]=="/echo"){
-        
+        echo_handler = statement->tokens_[i+2];
       }
 
     }
@@ -64,6 +67,8 @@ int main(int argc, char* argv[]) {
 
   cout << endl << "port_number: " << port_number << endl;
   cout << "static_root: " << static_root << endl;
+  cout << "static_handler: " << static_handler << endl;
+  cout << "echo_handler: " << echo_handler << endl;
 
   http::server::server s("localhost", port_number, static_root);
 
