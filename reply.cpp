@@ -104,10 +104,14 @@ namespace http {
       std::vector<boost::asio::const_buffer> buffers; //stores our strings into buffer and keeps them in a buffer vector
       buffers.push_back(status_strings::to_buffer(status));
 
-      buffers.push_back(boost::asio::buffer(header_name));
-      buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));
-      buffers.push_back(boost::asio::buffer(header_value));
-      buffers.push_back(boost::asio::buffer(misc_strings::crlf));
+      for (std::size_t i = 0; i < headers.size(); ++i)
+      {
+        header& h = headers[i];
+        buffers.push_back(boost::asio::buffer(h.name));
+        buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));
+        buffers.push_back(boost::asio::buffer(h.value));
+        buffers.push_back(boost::asio::buffer(misc_strings::crlf));
+      }
 
       buffers.push_back(boost::asio::buffer(misc_strings::crlf));
       buffers.push_back(boost::asio::buffer(content));
@@ -115,7 +119,7 @@ namespace http {
     }
 
     //don't need this
-    /* 
+     
     namespace stock_replies {
 
       const char ok[] = "";
@@ -238,7 +242,6 @@ namespace http {
 
     } // namespace stock_replies
 
-    //something bad happened, probably dont need this
     reply reply::stock_reply(reply::status_type status)
     {
       reply rep;
@@ -252,7 +255,7 @@ namespace http {
       return rep;
     }
 
-    */
+    
 
   } 
 } 

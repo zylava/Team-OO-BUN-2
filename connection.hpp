@@ -8,6 +8,7 @@
 #include "reply.h"
 #include "request.hpp"
 #include "request_handler.h"
+#include "request_parser.hpp"
 
 namespace http {
 namespace server {
@@ -58,6 +59,9 @@ private:
 
   /// The handler used to process the incoming request.
   request_handler& request_handler_;
+
+  request_parser request_parser_;
+
 };
 
 typedef std::shared_ptr<connection> connection_ptr;
