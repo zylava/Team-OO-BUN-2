@@ -5,6 +5,9 @@
 #include <memory>
 #include <boost/asio.hpp>
 #include <string>
+#include "reply.h"
+#include "request.hpp"
+#include "request_handler.h"
 
 namespace http {
 namespace server {
@@ -16,7 +19,7 @@ public:
   // connection(const connection&) = delete;
   // connection& operator=(const connection&) = delete;
 
-  explicit connection(boost::asio::ip::tcp::socket socket);
+  explicit connection(boost::asio::ip::tcp::socket socket, request_handler& handler);
 
   void start();
   
@@ -47,7 +50,14 @@ private:
 
   std::string reply_body;
 
+  reply rep; 
+
+  request req; 
+
   int connectionStatus; // 1 success 0 unsuccessful -1 error
+
+  /// The handler used to process the incoming request.
+  request_handler& request_handler_;
 };
 
 typedef std::shared_ptr<connection> connection_ptr;

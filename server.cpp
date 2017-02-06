@@ -8,7 +8,7 @@ namespace http {
 namespace server {
     //Constructor
     server::server(const std::string& address, const std::string& port, const std::string& doc_root)
-      : io_service_(), signals_(io_service_), acceptor_(io_service_), socket_(io_service_)
+      : io_service_(), signals_(io_service_), acceptor_(io_service_), socket_(io_service_), request_handler_(doc_root)
     {
       boost::asio::ip::tcp::resolver resolver(io_service_);
       boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
@@ -27,7 +27,7 @@ namespace server {
       signals_.add(SIGQUIT);
       #endif // defined(SIGQUIT)
 
-       do_await_stop();
+      do_await_stop();
 
       do_accept();
     }
@@ -51,11 +51,11 @@ namespace server {
           if (!ec) {
             // Creates a shared connection ptr and calls start on it
             // std::move gets rid of the copy constructor delete error
-            auto my_connection = std::make_shared<connection> (std::move(socket_));
+            auto my_connection = std::make_shared<connection> (std::move(socket_), request_handler_);
             my_connection->start(); 
           }
 
-          //do_accept();
+          do_accept();
         });
     }
 

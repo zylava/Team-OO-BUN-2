@@ -2,12 +2,13 @@
 #include <utility>
 #include <vector>
 #include <iostream> 
+#include "request_handler.h"
 
 namespace http {
 namespace server {
 
-connection::connection(boost::asio::ip::tcp::socket socket)
-  : socket_(std::move(socket))
+connection::connection(boost::asio::ip::tcp::socket socket, request_handler& handler)
+  : socket_(std::move(socket)), request_handler_(handler)
 {
 }
 
@@ -82,43 +83,34 @@ void connection::do_read()
       {
         if (!ec)
         {
-          // Appends the bytes read by async_read_some to the 'reply_' string
-          reply_.append(buffer_.data(), bytes_transferred);
-          if (reply_.substr(reply_.size() - 4, 4) == "\r\n\r\n")
-          { 
-            construct_response(reply_);
-            write_response(); 
-          }
-          else
-          {
-            connectionStatus = -1; 
-            stop(); 
-          }
+          //  echoing 
+          // rep.content.append(buffer_.data(), bytes_transferred);
+          // rep.header_name = "HTTP/1.1 200 OK"; 
+          // rep.header_value = "Content-Type: text/plain";
+          // rep.status = reply::ok; 
+          request_handler_.handle_request(req, rep);
+          write_response(); 
         }
       });
 }
 
-void connection::construct_response(std::string reply)
-{
-  // HTTP response and content type
-  // Send back a 200 (OK) code and plain text type
-  response_header = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
-
-  // We will be using 'response' to hold the request data from the user
-  std::string response;
-  response.append(reply);
-
-  // Cast the string into a char* as boost::asio::write requires a char*
-  // and the length of what char* points to (we use strlen for this)
-  reply_body = response;
-}
 
 void connection::write_response()
 {
-  boost::asio::write(socket_, boost::asio::buffer(get_response(), strlen(get_response())));
-  boost::asio::write(socket_, boost::asio::buffer(get_reply(), strlen(get_reply())));
+  auto self(shared_from_this());
+  boost::asio::async_write(socket_, rep.to_buffers(),
+      [this, self](boost::system::error_code ec, std::size_t)
+      {
+        if (!ec)
+        {
+          // Initiate graceful connection closure.
+          boost::system::error_code ignored_ec;
+          socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both,
+            ignored_ec);
+        }
 
-  stop();
+      });
+
 }
 
 } // namespace server
