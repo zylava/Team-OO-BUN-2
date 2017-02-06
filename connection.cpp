@@ -94,11 +94,34 @@ void connection::do_read()
           std::tie(result, std::ignore) = request_parser_.parse(
           req, buffer_.data(), buffer_.data() + bytes_transferred);
 
-          if (result == request_parser::good)
+          std::string server_mode="";
+          std::size_t first_slash_pos = req.uri.find_first_of("/"); 
+          for(char& c : req.uri.substr(first_slash_pos + 1)) {
+            if (c == '/'){
+              break; 
+            } 
+            server_mode += c;
+          }
+
+          //std::cout << server_mode << std::endl;
+
+          if (result == request_parser::good && server_mode == "echo"){
+            rep.content.append(buffer_.data(), bytes_transferred);
+            rep.headers.resize(2);
+            rep.headers[0].name = "Content-Length";
+            rep.headers[0].value = std::to_string(rep.content.size());
+            rep.headers[1].name = "Content-Type";
+            rep.headers[1].value = "text/plain";
+            rep.status = reply::ok;
+            write_response();
+
+          }
+          else if (result == request_parser::good && server_mode == "static")
           {
             request_handler_.handle_request(req, rep);
             write_response(); 
           }
+
         }
       });
 }
