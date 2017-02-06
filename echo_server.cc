@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
   cout << "static_root: " << static_root << endl;
 
   http::server::server s("localhost", port_number, static_root);
+
   s.run();
   return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "header.hpp"
 
 namespace http {
 namespace server {
@@ -11,11 +12,10 @@ namespace server {
 struct request
 {
   std::string method;
-  // std::string uri;
-  // int http_version_major;
-  // int http_version_minor;
-  std::string header_name; 
-  std::string header_value;
+  std::string uri;
+  int http_version_major;
+  int http_version_minor;
+  std::vector<header> headers;
 };
 
 } // namespace server

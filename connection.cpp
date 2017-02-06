@@ -88,8 +88,17 @@ void connection::do_read()
           // rep.header_name = "HTTP/1.1 200 OK"; 
           // rep.header_value = "Content-Type: text/plain";
           // rep.status = reply::ok; 
-          request_handler_.handle_request(req, rep);
-          write_response(); 
+
+          //static 
+          request_parser::result_type result;
+          std::tie(result, std::ignore) = request_parser_.parse(
+          req, buffer_.data(), buffer_.data() + bytes_transferred);
+
+          if (result == request_parser::good)
+          {
+            request_handler_.handle_request(req, rep);
+            write_response(); 
+          }
         }
       });
 }

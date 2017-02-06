@@ -3,8 +3,8 @@ GMOCK_DIR=ngnix/googletest/googlemock
 
 all: echo_server
 
-echo_server: echo_server.cc ngnix/config_parser.cc reply.cpp mime_types.cpp request_handler.cpp server.cpp connection.cpp 
-	g++ echo_server.cc ngnix/config_parser.cc reply.cpp mime_types.cpp request_handler.cpp server.cpp connection.cpp \
+echo_server: echo_server.cc ngnix/config_parser.cc reply.cpp mime_types.cpp request_handler.cpp request_parser.cpp server.cpp connection.cpp 
+	g++ echo_server.cc ngnix/config_parser.cc reply.cpp mime_types.cpp request_handler.cpp request_parser.cpp server.cpp connection.cpp \
 	-std=c++0x -g -Wall -lboost_regex -lboost_system -lpthread -o webserver
 
 test: server_test.cc connection_test.cc server.cpp ${GTEST_DIR}/src/gtest-all.cc connection.cpp ${GTEST_DIR}/src/gtest_main.cc ${GMOCK_DIR}/src/gmock-all.cc
