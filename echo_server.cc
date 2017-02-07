@@ -58,10 +58,10 @@ int main(int argc, char* argv[]) {
   // string path = "";
   // string root = "";
 
-  if ( static_root.front() == '"' ) {
+  if ( static_root.front() == '"' || static_root.front()=='\'' ) {
     static_root.erase( 0, 1 ); // erase the first character
   }
-  if ( static_root.back() == '"') {
+  if ( static_root.back() == '"' || static_root.back()=='\'') {
     static_root.erase( static_root.size() - 1 ); // erase the last character
   }
 

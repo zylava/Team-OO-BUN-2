@@ -5,5 +5,5 @@ path /echo EchoHandler {
 }
 
 path /static StaticFileHandler {
-	root "static";
+	root ".";
 }

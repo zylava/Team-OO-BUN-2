@@ -116,10 +116,13 @@ void connection::do_read()
             write_response();
 
           }
-          else if (result == request_parser::good && server_mode == "static")
+          else if (result == request_parser::good)
           {
             request_handler_.handle_request(req, rep);
             write_response(); 
+          }
+          else {
+            //TODO: Bad request
           }
 
         }

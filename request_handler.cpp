@@ -57,7 +57,7 @@ namespace server {
 
     //std::cout << server_mode << std::endl; 
 
-    request_path = request_path.substr(first_slash_pos + end_server_mode_pos); 
+    //request_path = request_path.substr(first_slash_pos + end_server_mode_pos); 
 
     //std::cout << "req.uri path = " << req.uri << std::endl; 
     //std::cout << "request path = " << request_path << std::endl;
@@ -81,7 +81,7 @@ namespace server {
     // Open the file to send back.
     std::string full_path = doc_root_ + request_path;
 
-    //std::cout << "full path = " << full_path << std::endl; 
+    std::cout << "full path = " << full_path << std::endl; 
 
     std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
     if (!is)
