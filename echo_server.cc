@@ -60,8 +60,12 @@ int main(int argc, char* argv[]) {
   cout << "static_handler: " << static_handler << endl;
   cout << "echo_handler: " << echo_handler << endl;
 
-  http::server::server s("localhost", port_number, static_root);
+  if (stoi(port_number) < 0 || stoi(port_number) > 65535) {
+    std::cerr << "Error: Port number not in range [0:65535].\n";
+    return false;
+  }
 
+  http::server::server s("localhost", port_number, static_root);
   s.run();
   return 0;
 }

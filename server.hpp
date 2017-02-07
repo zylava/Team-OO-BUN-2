@@ -20,6 +20,7 @@ namespace server {
       void run(); 
       bool getStatus(); 
       void stop();
+      bool create_connection(const boost::system::error_code& ec);
       std::string getPortNum(); 
       std::string getAddress(); 
       std::string getFileName(); 
