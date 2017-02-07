@@ -19,3 +19,17 @@ server_test.gcno
 test_config
 webserver
 mytest
+mime_types.gcda
+mime_types.gcno
+reply.gcda
+reply.gcno
+reply_test.gcda
+reply_test.gcno
+request_handler.gcda
+request_handler.gcno
+request_handler_test.gcda
+request_handler_test.gcno
+request_parser.gcda
+request_parser.gcno
+request_parser_test.gcda
+request_parser_test.gcno
