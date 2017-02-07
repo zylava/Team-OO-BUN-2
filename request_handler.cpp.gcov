@@ -1,0 +1,128 @@
+        -:    0:Source:request_handler.cpp
+        -:    0:Programs:4
+        -:    1://
+        -:    2:// request_handler.cpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2013 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#include "request_handler.h"
+        -:   12:#include <fstream>
+        -:   13:#include <sstream>
+        -:   14:#include <string>
+        -:   15:#include "mime_types.hpp"
+        -:   16:#include "reply.h"
+        -:   17:#include "request.hpp"
+        -:   18:#include <iostream> 
+        -:   19:
+        -:   20:namespace http {
+        -:   21:namespace server {
+        -:   22:
+        6:   23:  request_handler::request_handler(const std::string& doc_root)
+        6:   24:    : doc_root_(doc_root)
+        -:   25:  {
+        6:   26:  }
+        -:   27:
+        3:   28:  void request_handler::handle_request(const request& req, reply& rep)
+        -:   29:  {
+        -:   30:    // Decode url to path.
+        3:   31:    std::string request_path;
+        -:   32:
+        3:   33:    if (!url_decode(req.uri, request_path))
+        -:   34:    {
+    #####:   35:      rep = reply::stock_reply(reply::bad_request);
+    #####:   36:      return;
+        -:   37:    }
+        -:   38:
+        -:   39:    // Request path must be absolute and not contain "..".
+        9:   40:    if (request_path.empty() || request_path[0] != '/'
+        5:   41:        || request_path.find("..") != std::string::npos)
+        -:   42:    {
+        1:   43:      rep = reply::stock_reply(reply::bad_request);
+        1:   44:      return;
+        -:   45:    }
+        -:   46:
+        -:   47:    // If path ends in slash (i.e. is a directory) then add "index.html".
+        2:   48:    if (request_path[request_path.size() - 1] == '/')
+        -:   49:    {
+    #####:   50:      request_path += "index.html";
+        -:   51:    }
+        -:   52:
+        -:   53:    // Determine the file extension.
+        2:   54:    std::size_t last_slash_pos = request_path.find_last_of("/");
+        2:   55:    std::size_t last_dot_pos = request_path.find_last_of(".");
+        3:   56:    std::string extension;
+        2:   57:    if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
+        -:   58:    {
+        2:   59:      extension = request_path.substr(last_dot_pos + 1);
+        -:   60:    }
+        -:   61:
+        -:   62:    // Open the file to send back.
+        3:   63:    std::string full_path = doc_root_ + request_path;
+        -:   64:
+        2:   65:    std::cout << "full path = " << full_path << std::endl; 
+        -:   66:
+        3:   67:    std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
+        2:   68:    if (!is)
+        -:   69:    {
+        1:   70:      rep = reply::stock_reply(reply::not_found);
+        1:   71:      return;
+        -:   72:    }
+        -:   73:
+        -:   74:    // Fill out the reply to be sent to the client.
+        1:   75:    rep.status = reply::ok;
+        -:   76:    char buf[512];
+        3:   77:    while (is.read(buf, sizeof(buf)).gcount() > 0)
+        1:   78:      rep.content.append(buf, is.gcount());
+        1:   79:    rep.headers.resize(2);
+        1:   80:    rep.headers[0].name = "Content-Length";
+        1:   81:    rep.headers[0].value = std::to_string(rep.content.size());
+        1:   82:    rep.headers[1].name = "Content-Type";
+        2:   83:    rep.headers[1].value = mime_types::extension_to_type(extension);
+        -:   84:  }
+        -:   85:
+        3:   86:  bool request_handler::url_decode(const std::string& in, std::string& out)
+        -:   87:  {
+        3:   88:    out.clear();
+        3:   89:    out.reserve(in.size());
+       49:   90:    for (std::size_t i = 0; i < in.size(); ++i)
+        -:   91:    {
+       46:   92:      if (in[i] == '%')
+        -:   93:      {
+    #####:   94:        if (i + 3 <= in.size())
+        -:   95:        {
+    #####:   96:          int value = 0;
+    #####:   97:          std::istringstream is(in.substr(i + 1, 2));
+    #####:   98:          if (is >> std::hex >> value)
+        -:   99:          {
+    #####:  100:            out += static_cast<char>(value);
+    #####:  101:            i += 2;
+        -:  102:          }
+        -:  103:          else
+        -:  104:          {
+    #####:  105:            return false;
+    #####:  106:          }
+        -:  107:        }
+        -:  108:        else
+        -:  109:        {
+    #####:  110:          return false;
+        -:  111:        }
+        -:  112:      }
+       46:  113:      else if (in[i] == '+')
+        -:  114:      {
+    #####:  115:        out += ' ';
+        -:  116:      }
+        -:  117:      else
+        -:  118:      {
+       46:  119:        out += in[i];
+        -:  120:      }
+        -:  121:    }
+        3:  122:    return true;
+        -:  123:  }
+        -:  124:
+        -:  125:  } // namespace server
+        3:  126:} // namespace http

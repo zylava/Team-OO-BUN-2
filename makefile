@@ -3,16 +3,17 @@ GMOCK_DIR=ngnix/googletest/googlemock
 
 all: echo_server
 
-echo_server: echo_server.cc ngnix/config_parser.cc server.cpp connection.cpp
-	g++ echo_server.cc ngnix/config_parser.cc server.cpp connection.cpp \
+echo_server: echo_server.cc ngnix/config_parser.cc reply.cpp mime_types.cpp request_handler.cpp request_parser.cpp server.cpp connection.cpp 
+	g++ echo_server.cc ngnix/config_parser.cc reply.cpp mime_types.cpp request_handler.cpp request_parser.cpp server.cpp connection.cpp \
 	-std=c++0x -g -Wall -lboost_regex -lboost_system -lpthread -o webserver
 
-test: server_test.cc connection_test.cc server.cpp ${GTEST_DIR}/src/gtest-all.cc connection.cpp ${GTEST_DIR}/src/gtest_main.cc ${GMOCK_DIR}/src/gmock-all.cc
-	g++ server_test.cc connection_test.cc server.cpp -isystem ${GTEST_DIR}/include \
-	-I${GTEST_DIR} ${GTEST_DIR}/src/gtest-all.cc connection.cpp ${GTEST_DIR}/src/gtest_main.cc \
+test: mime_types.cpp reply.cpp reply_test.cpp request_parser.cpp request_handler.cpp request_parser_test.cpp request_handler_test.cpp connection.cpp connection_test.cc ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc ${GMOCK_DIR}/src/gmock-all.cc
+	g++ mime_types.cpp reply.cpp reply_test.cpp request_parser.cpp request_handler.cpp request_parser_test.cpp request_handler_test.cpp connection.cpp connection_test.cc -isystem ${GTEST_DIR}/include \
+	-I${GTEST_DIR} ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc \
 	-isystem ${GMOCK_DIR}/include -I${GMOCK_DIR} ${GMOCK_DIR}/src/gmock-all.cc \
-	-std=c++0x -g -Wall -lboost_regex -lboost_system -lpthread -o mytest
+	-std=c++0x -g -Wall -lboost_regex -lboost_system -fprofile-arcs -ftest-coverage -lpthread -o mytest
 	./mytest
+	gcov -r connection.cpp reply.cpp request_handler.cpp request_parser.cpp server.cpp
 
 gcov: server_test.cc connection_test.cc server.cpp ${GTEST_DIR}/src/gtest-all.cc connection.cpp ${GTEST_DIR}/src/gtest_main.cc ${GMOCK_DIR}/src/gmock-all.cc
 	g++ server_test.cc connection_test.cc server.cpp -isystem ${GTEST_DIR}/include \

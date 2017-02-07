@@ -1,4 +1,9 @@
+port 1080;
 
-server {
-	listen 1080;
+path /echo EchoHandler {
+	placeholder;
+}
+
+path /static StaticFileHandler {
+	root ".";
 }

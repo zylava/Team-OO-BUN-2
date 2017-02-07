@@ -2,27 +2,37 @@
 
 make 
 
-echo -e "server {\n    listen 8080;\n}" > test_config
+port=1080
+
+# echo -e "server {\n    listen $port;\n}" > test_config
+# echo -e "\nconfig:"
+# cat test_config
+# echo ""
+
+echo -e "port $port;\n" > test_config
+echo -e "path /echo EchoHandler {\n    placeholder;\n}" >> test_config
+echo -e "path /static StaticFileHandler {\n    root \".\";\n}" >> test_config
+
 echo -e "\nconfig:"
 cat test_config
-echo ""
 
 ./webserver test_config & PID=$!
 
-# curl http://localhost:8080
+# response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
+# echo "HTTP response code is $response"
 
-response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
-echo "HTTP response code is $response"
+# content_type=$(curl -s -o /dev/null -w "%{content_type}" http://localhost:8080)
+# echo "Content Type is $content_type"
 
-content_type=$(curl -s -o /dev/null -w "%{content_type}" http://localhost:8080)
-echo "Content Type is $content_type"
+curl -s -I http://localhost:$port/static/integration.html > /tmp/actual
 
-echo ""
+kill $PID
 
-if [ $response == "200" ] && [ $content_type == "text/plain" ]; then
+diff testdata/expected /tmp/actual
+
+if [ $? == 0 ]; then
 	echo "Success with exit code $?"
 else
 	echo "Fail with exit code $?"
 fi
 
-kill $PID

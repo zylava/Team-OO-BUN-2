@@ -5,9 +5,16 @@
 #include <memory>
 #include <boost/asio.hpp>
 #include <string>
+#include "reply.h"
+#include "request.hpp"
+#include "request_handler.h"
+#include "request_parser.hpp"
 
 namespace http {
 namespace server {
+
+// 8192 is maximum size of a package sent on a network
+static const int MAX_BUFFER_SIZE = 8192;
 
 class connection : public std::enable_shared_from_this<connection>
 {
@@ -16,21 +23,21 @@ public:
   // connection(const connection&) = delete;
   // connection& operator=(const connection&) = delete;
 
-  explicit connection(boost::asio::ip::tcp::socket socket);
+  explicit connection(boost::asio::ip::tcp::socket socket, request_handler& handler);
 
   void start();
   
   void stop();
 
-  const char* get_response();
-
-  const char* get_reply();
+  reply get_reply();
   
   int getConnectionStatus(); 
-
-  void construct_response(std::string reply);
   
   void write_response();
+
+  std::string parse_command(request request);
+
+  void create_echo_response(const char* data, std::size_t bytes);
   
 private:
   void do_read();
@@ -39,15 +46,19 @@ private:
 
   boost::asio::ip::tcp::socket socket_;
 
-  std::array<char, 8192> buffer_;
+  std::array<char, MAX_BUFFER_SIZE> buffer_;
 
-  std::string reply_;
+  reply rep; 
 
-  const char* response_header;
-
-  std::string reply_body;
+  request req; 
 
   int connectionStatus; // 1 success 0 unsuccessful -1 error
+
+  /// The handler used to process the incoming request.
+  request_handler& request_handler_;
+
+  request_parser request_parser_;
+
 };
 
 typedef std::shared_ptr<connection> connection_ptr;

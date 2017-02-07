@@ -1,0 +1,263 @@
+        -:    0:Source:reply.cpp
+        -:    0:Programs:4
+        -:    1://
+        -:    2:// reply.cpp
+        -:    3:// ~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2013 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#include "reply.h"
+        -:   12:#include <string>
+        -:   13:
+        -:   14:namespace http {
+        -:   15:  namespace server {
+        -:   16:
+        -:   17:    namespace status_strings {
+        -:   18:
+        1:   19:      const std::string ok =
+        -:   20:        "HTTP/1.0 200 OK\r\n";
+        1:   21:      const std::string created =
+        -:   22:        "HTTP/1.0 201 Created\r\n";
+        1:   23:      const std::string accepted =
+        -:   24:        "HTTP/1.0 202 Accepted\r\n";
+        1:   25:      const std::string no_content =
+        -:   26:        "HTTP/1.0 204 No Content\r\n";
+        1:   27:      const std::string multiple_choices =
+        -:   28:        "HTTP/1.0 300 Multiple Choices\r\n";
+        1:   29:      const std::string moved_permanently =
+        -:   30:        "HTTP/1.0 301 Moved Permanently\r\n";
+        1:   31:      const std::string moved_temporarily =
+        -:   32:        "HTTP/1.0 302 Moved Temporarily\r\n";
+        1:   33:      const std::string not_modified =
+        -:   34:        "HTTP/1.0 304 Not Modified\r\n";
+        1:   35:      const std::string bad_request =
+        -:   36:        "HTTP/1.0 400 Bad Request\r\n";
+        1:   37:      const std::string unauthorized =
+        -:   38:        "HTTP/1.0 401 Unauthorized\r\n";
+        1:   39:      const std::string forbidden =
+        -:   40:        "HTTP/1.0 403 Forbidden\r\n";
+        1:   41:      const std::string not_found =
+        -:   42:        "HTTP/1.0 404 Not Found\r\n";
+        1:   43:      const std::string internal_server_error =
+        -:   44:        "HTTP/1.0 500 Internal Server Error\r\n";
+        1:   45:      const std::string not_implemented =
+        -:   46:        "HTTP/1.0 501 Not Implemented\r\n";
+        1:   47:      const std::string bad_gateway =
+        -:   48:        "HTTP/1.0 502 Bad Gateway\r\n";
+        1:   49:      const std::string service_unavailable =
+        -:   50:        "HTTP/1.0 503 Service Unavailable\r\n";
+        -:   51:
+    #####:   52:      boost::asio::const_buffer to_buffer(reply::status_type status)
+        -:   53:      {
+    #####:   54:        switch (status)
+        -:   55:        {
+        -:   56:          case reply::ok:
+    #####:   57:            return boost::asio::buffer(ok);
+        -:   58:          case reply::created:
+    #####:   59:            return boost::asio::buffer(created);
+        -:   60:          case reply::accepted:
+    #####:   61:            return boost::asio::buffer(accepted);
+        -:   62:          case reply::no_content:
+    #####:   63:            return boost::asio::buffer(no_content);
+        -:   64:          case reply::multiple_choices:
+    #####:   65:            return boost::asio::buffer(multiple_choices);
+        -:   66:          case reply::moved_permanently:
+    #####:   67:            return boost::asio::buffer(moved_permanently);
+        -:   68:          case reply::moved_temporarily:
+    #####:   69:            return boost::asio::buffer(moved_temporarily);
+        -:   70:          case reply::not_modified:
+    #####:   71:            return boost::asio::buffer(not_modified);
+        -:   72:          case reply::bad_request:
+    #####:   73:            return boost::asio::buffer(bad_request);
+        -:   74:          case reply::unauthorized:
+    #####:   75:            return boost::asio::buffer(unauthorized);
+        -:   76:          case reply::forbidden:
+    #####:   77:            return boost::asio::buffer(forbidden);
+        -:   78:          case reply::not_found:
+    #####:   79:            return boost::asio::buffer(not_found);
+        -:   80:          case reply::internal_server_error:
+    #####:   81:            return boost::asio::buffer(internal_server_error);
+        -:   82:          case reply::not_implemented:
+    #####:   83:            return boost::asio::buffer(not_implemented);
+        -:   84:          case reply::bad_gateway:
+    #####:   85:            return boost::asio::buffer(bad_gateway);
+        -:   86:          case reply::service_unavailable:
+    #####:   87:            return boost::asio::buffer(service_unavailable);
+        -:   88:          default:
+    #####:   89:            return boost::asio::buffer(internal_server_error);
+        -:   90:        }
+        -:   91:      }
+        -:   92:
+        -:   93:    } // namespace status_strings
+        -:   94:
+        -:   95:    namespace misc_strings {
+        -:   96:
+        -:   97:      const char name_value_separator[] = { ':', ' ' };
+        -:   98:      const char crlf[] = { '\r', '\n' };
+        -:   99:
+        -:  100:    } // namespace misc_strings
+        -:  101:
+    #####:  102:    std::vector<boost::asio::const_buffer> reply::to_buffers()
+        -:  103:    {
+    #####:  104:      std::vector<boost::asio::const_buffer> buffers; //stores our strings into buffer and keeps them in a buffer vector
+    #####:  105:      buffers.push_back(status_strings::to_buffer(status));
+        -:  106:
+    #####:  107:      for (std::size_t i = 0; i < headers.size(); ++i)
+        -:  108:      {
+    #####:  109:        header& h = headers[i];
+    #####:  110:        buffers.push_back(boost::asio::buffer(h.name));
+    #####:  111:        buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));
+    #####:  112:        buffers.push_back(boost::asio::buffer(h.value));
+    #####:  113:        buffers.push_back(boost::asio::buffer(misc_strings::crlf));
+        -:  114:      }
+        -:  115:
+    #####:  116:      buffers.push_back(boost::asio::buffer(misc_strings::crlf));
+    #####:  117:      buffers.push_back(boost::asio::buffer(content));
+    #####:  118:      return buffers;
+        -:  119:    }
+        -:  120:
+        -:  121:    //don't need this
+        -:  122:     
+        -:  123:    namespace stock_replies {
+        -:  124:
+        -:  125:      const char ok[] = "";
+        -:  126:      const char created[] =
+        -:  127:        "<html>"
+        -:  128:        "<head><title>Created</title></head>"
+        -:  129:        "<body><h1>201 Created</h1></body>"
+        -:  130:        "</html>";
+        -:  131:      const char accepted[] =
+        -:  132:        "<html>"
+        -:  133:        "<head><title>Accepted</title></head>"
+        -:  134:        "<body><h1>202 Accepted</h1></body>"
+        -:  135:        "</html>";
+        -:  136:      const char no_content[] =
+        -:  137:        "<html>"
+        -:  138:        "<head><title>No Content</title></head>"
+        -:  139:        "<body><h1>204 Content</h1></body>"
+        -:  140:        "</html>";
+        -:  141:      const char multiple_choices[] =
+        -:  142:        "<html>"
+        -:  143:        "<head><title>Multiple Choices</title></head>"
+        -:  144:        "<body><h1>300 Multiple Choices</h1></body>"
+        -:  145:        "</html>";
+        -:  146:      const char moved_permanently[] =
+        -:  147:        "<html>"
+        -:  148:        "<head><title>Moved Permanently</title></head>"
+        -:  149:        "<body><h1>301 Moved Permanently</h1></body>"
+        -:  150:        "</html>";
+        -:  151:      const char moved_temporarily[] =
+        -:  152:        "<html>"
+        -:  153:        "<head><title>Moved Temporarily</title></head>"
+        -:  154:        "<body><h1>302 Moved Temporarily</h1></body>"
+        -:  155:        "</html>";
+        -:  156:      const char not_modified[] =
+        -:  157:        "<html>"
+        -:  158:        "<head><title>Not Modified</title></head>"
+        -:  159:        "<body><h1>304 Not Modified</h1></body>"
+        -:  160:        "</html>";
+        -:  161:      const char bad_request[] =
+        -:  162:        "<html>"
+        -:  163:        "<head><title>Bad Request</title></head>"
+        -:  164:        "<body><h1>400 Bad Request</h1></body>"
+        -:  165:        "</html>";
+        -:  166:      const char unauthorized[] =
+        -:  167:        "<html>"
+        -:  168:        "<head><title>Unauthorized</title></head>"
+        -:  169:        "<body><h1>401 Unauthorized</h1></body>"
+        -:  170:        "</html>";
+        -:  171:      const char forbidden[] =
+        -:  172:        "<html>"
+        -:  173:        "<head><title>Forbidden</title></head>"
+        -:  174:        "<body><h1>403 Forbidden</h1></body>"
+        -:  175:        "</html>";
+        -:  176:      const char not_found[] =
+        -:  177:        "<html>"
+        -:  178:        "<head><title>Not Found</title></head>"
+        -:  179:        "<body><h1>404 Not Found</h1></body>"
+        -:  180:        "</html>";
+        -:  181:      const char internal_server_error[] =
+        -:  182:        "<html>"
+        -:  183:        "<head><title>Internal Server Error</title></head>"
+        -:  184:        "<body><h1>500 Internal Server Error</h1></body>"
+        -:  185:        "</html>";
+        -:  186:      const char not_implemented[] =
+        -:  187:        "<html>"
+        -:  188:        "<head><title>Not Implemented</title></head>"
+        -:  189:        "<body><h1>501 Not Implemented</h1></body>"
+        -:  190:        "</html>";
+        -:  191:      const char bad_gateway[] =
+        -:  192:        "<html>"
+        -:  193:        "<head><title>Bad Gateway</title></head>"
+        -:  194:        "<body><h1>502 Bad Gateway</h1></body>"
+        -:  195:        "</html>";
+        -:  196:      const char service_unavailable[] =
+        -:  197:        "<html>"
+        -:  198:        "<head><title>Service Unavailable</title></head>"
+        -:  199:        "<body><h1>503 Service Unavailable</h1></body>"
+        -:  200:        "</html>";
+        -:  201:
+       18:  202:      std::string to_string(reply::status_type status)
+        -:  203:      {
+       18:  204:        switch (status)
+        -:  205:        {
+        -:  206:        case reply::ok:
+        1:  207:          return ok;
+        -:  208:        case reply::created:
+        1:  209:          return created;
+        -:  210:        case reply::accepted:
+        1:  211:          return accepted;
+        -:  212:        case reply::no_content:
+        1:  213:          return no_content;
+        -:  214:        case reply::multiple_choices:
+        1:  215:          return multiple_choices;
+        -:  216:        case reply::moved_permanently:
+        1:  217:          return moved_permanently;
+        -:  218:        case reply::moved_temporarily:
+        1:  219:          return moved_temporarily;
+        -:  220:        case reply::not_modified:
+        1:  221:          return not_modified;
+        -:  222:        case reply::bad_request:
+        2:  223:          return bad_request;
+        -:  224:        case reply::unauthorized:
+        1:  225:          return unauthorized;
+        -:  226:        case reply::forbidden:
+        1:  227:          return forbidden;
+        -:  228:        case reply::not_found:
+        2:  229:          return not_found;
+        -:  230:        case reply::internal_server_error:
+        1:  231:          return internal_server_error;
+        -:  232:        case reply::not_implemented:
+        1:  233:          return not_implemented;
+        -:  234:        case reply::bad_gateway:
+        1:  235:          return bad_gateway;
+        -:  236:        case reply::service_unavailable:
+        1:  237:          return service_unavailable;
+        -:  238:        default:
+    #####:  239:          return internal_server_error;
+        -:  240:        }
+        -:  241:      }
+        -:  242:
+        -:  243:    } // namespace stock_replies
+        -:  244:
+       18:  245:    reply reply::stock_reply(reply::status_type status)
+        -:  246:    {
+       18:  247:      reply rep;
+       18:  248:      rep.status = status;
+       18:  249:      rep.content = stock_replies::to_string(status);
+       18:  250:      rep.headers.resize(2);
+       18:  251:      rep.headers[0].name = "Content-Length";
+       18:  252:      rep.headers[0].value = std::to_string(rep.content.size());
+       18:  253:      rep.headers[1].name = "Content-Type";
+       18:  254:      rep.headers[1].value = "text/html";
+       18:  255:      return rep;
+        -:  256:    }
+        -:  257:
+        -:  258:    
+        -:  259:
+        -:  260:  } 
+        3:  261:} 

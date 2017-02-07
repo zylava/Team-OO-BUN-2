@@ -4,6 +4,7 @@
 #include <boost/asio.hpp>
 #include <string>
 #include "connection.hpp"
+#include "request_handler.h"
 
 namespace http {
 namespace server {
@@ -41,6 +42,9 @@ namespace server {
       std::string portNum_; 
       std::string address_; 
       std::string fileName_;
+
+      /// The handler for all incoming requests.
+      request_handler request_handler_;
 
     };
   }
