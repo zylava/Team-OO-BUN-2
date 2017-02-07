@@ -117,8 +117,6 @@ namespace http {
       buffers.push_back(boost::asio::buffer(content));
       return buffers;
     }
-
-    //don't need this
      
     namespace stock_replies {
 

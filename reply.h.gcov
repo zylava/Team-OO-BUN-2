@@ -38,23 +38,19 @@
         -:   36:  /// The headers to be included in the reply.
         -:   37:  std::vector<header> headers;  // we only have to handle one resquest at a time, only one header needed.
         -:   38:
-        -:   39:  //TODO make sure these get instantiated somewhere
-        -:   40:  // std::string header_name; 
-        -:   41:  // std::string header_value; 
-        -:   42:
-        -:   43:  /// The content to be sent in the reply.
-        -:   44:  std::string content;
-        -:   45:
-        -:   46:  /// Convert the reply into a vector of buffers. The buffers do not own the
-        -:   47:  /// underlying memory blocks, therefore the reply object must remain valid and
-        -:   48:  /// not be changed until the write operation has completed.
-        -:   49:  std::vector<boost::asio::const_buffer> to_buffers();
+        -:   39:  /// The content to be sent in the reply.
+        -:   40:  std::string content;
+        -:   41:
+        -:   42:  /// Convert the reply into a vector of buffers. The buffers do not own the
+        -:   43:  /// underlying memory blocks, therefore the reply object must remain valid and
+        -:   44:  /// not be changed until the write operation has completed.
+        -:   45:  std::vector<boost::asio::const_buffer> to_buffers();
+        -:   46:
+        -:   47:  /// Get a stock reply.
+        -:   48:  static reply stock_reply(status_type status);
+        -:   49:};
         -:   50:
-        -:   51:  /// Get a stock reply.
-        -:   52:  static reply stock_reply(status_type status);
-        -:   53:};
-        -:   54:
-        -:   55:} // namespace server
-        -:   56:} // namespace http
-        -:   57:
-        -:   58:#endif // HTTP_REPLY_HPP
+        -:   51:} // namespace server
+        -:   52:} // namespace http
+        -:   53:
+        -:   54:#endif // HTTP_REPLY_HPP

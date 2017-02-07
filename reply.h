@@ -36,10 +36,6 @@ struct reply
   /// The headers to be included in the reply.
   std::vector<header> headers;  // we only have to handle one resquest at a time, only one header needed.
 
-  //TODO make sure these get instantiated somewhere
-  // std::string header_name; 
-  // std::string header_value; 
-
   /// The content to be sent in the reply.
   std::string content;
 

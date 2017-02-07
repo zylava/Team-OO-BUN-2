@@ -52,7 +52,14 @@ private:
 
   request req; 
 
-  int connectionStatus; // 1 success 0 unsuccessful -1 error
+  enum connection_status
+  {
+    error = -1, 
+    unsuccessful = 0, 
+    success = 1
+  };
+
+  int connectionStatus;
 
   /// The handler used to process the incoming request.
   request_handler& request_handler_;

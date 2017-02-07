@@ -14,7 +14,7 @@ connection::connection(boost::asio::ip::tcp::socket socket, request_handler& han
 
 void connection::start()
 {
-  connectionStatus = 1; // success
+  connectionStatus = connection::success; 
   do_read();
 }
 
