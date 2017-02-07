@@ -13,6 +13,9 @@
 namespace http {
 namespace server {
 
+// 8192 is maximum size of a package sent on a network
+static const int MAX_BUFFER_SIZE = 8192;
+
 class connection : public std::enable_shared_from_this<connection>
 {
 public:
@@ -26,15 +29,15 @@ public:
   
   void stop();
 
-  const char* get_response();
-
-  const char* get_reply();
+  reply get_reply();
   
   int getConnectionStatus(); 
-
-  void construct_response(std::string reply);
   
   void write_response();
+
+  std::string parse_command(request request);
+
+  void create_echo_response(const char* data, std::size_t bytes);
   
 private:
   void do_read();
@@ -43,13 +46,7 @@ private:
 
   boost::asio::ip::tcp::socket socket_;
 
-  std::array<char, 8192> buffer_;
-
-  std::string reply_;
-
-  const char* response_header;
-
-  std::string reply_body;
+  std::array<char, MAX_BUFFER_SIZE> buffer_;
 
   reply rep; 
 

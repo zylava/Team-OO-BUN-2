@@ -48,16 +48,6 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  //parses the config file for the port number 
-  // string parse_string = config.ToString().c_str();
-  // string port_number = boost::regex_replace(
-  //   parse_string,
-  //   boost::regex("[^0-9]*([0-9]+).*"),
-  //   string("\\1")
-  //   );
-  // string path = "";
-  // string root = "";
-
   if ( static_root.front() == '"' || static_root.front()=='\'' ) {
     static_root.erase( 0, 1 ); // erase the first character
   }

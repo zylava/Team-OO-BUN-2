@@ -29,50 +29,9 @@ int connection::getConnectionStatus()
   return connectionStatus; 
 }
 
-
-// void connection::do_read()
-// {
-//   auto self(shared_from_this());
-//   socket_.async_read_some(boost::asio::buffer(buffer_),
-//       [this, self](boost::system::error_code ec, std::size_t bytes_transferred)
-//       {
-//         if (!ec)
-//         {
-//           // Appends the bytes read by async_read_some to the 'reply_' string
-//           reply_.append(buffer_.data(), bytes_transferred);
-//           if (reply_.substr(reply_.size() - 4, 4) == "\r\n\r\n")
-//           {
-//             // HTTP response and content type
-//             // Send back a 200 (OK) code and plain text type
-//             const char* response_string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
-
-//             // We will be using 'response' to hold the request data from the user
-//             std::string response;
-//             response.append(reply_);
-
-//             // Cast the string into a char* as boost::asio::write requires a char*
-//             // and the length of what char* points to (we use strlen for this)
-//             const char* reply_body = response.c_str();
-            
-//             write_response(response_string, reply_body); 
-//           }
-//           else
-//           {
-//             connectionStatus = -1; 
-//             stop(); 
-//           }
-//         }
-//       });
-// }
-
-const char* connection::get_response()
+reply connection::get_reply()
 {
-  return response_header;
-}
-
-const char* connection::get_reply()
-{
-  return reply_body.c_str();
+  return rep;
 }
 
 void connection::do_read()
@@ -83,52 +42,53 @@ void connection::do_read()
       {
         if (!ec)
         {
-          //  echoing 
-          // rep.content.append(buffer_.data(), bytes_transferred);
-          // rep.header_name = "HTTP/1.1 200 OK"; 
-          // rep.header_value = "Content-Type: text/plain";
-          // rep.status = reply::ok; 
-
-          //static 
           request_parser::result_type result;
           std::tie(result, std::ignore) = request_parser_.parse(
-          req, buffer_.data(), buffer_.data() + bytes_transferred);
+          	req, buffer_.data(), buffer_.data() + bytes_transferred);
 
-          std::string server_mode="";
-          std::size_t first_slash_pos = req.uri.find_first_of("/"); 
-          for(char& c : req.uri.substr(first_slash_pos + 1)) {
-            if (c == '/'){
-              break; 
-            } 
-            server_mode += c;
-          }
+          // Determine /echo or /static
+          std::string server_mode = parse_command(req);
 
-          //std::cout << server_mode << std::endl;
-
+          // echo
           if (result == request_parser::good && server_mode == "echo"){
-            rep.content.append(buffer_.data(), bytes_transferred);
-            rep.headers.resize(2);
-            rep.headers[0].name = "Content-Length";
-            rep.headers[0].value = std::to_string(rep.content.size());
-            rep.headers[1].name = "Content-Type";
-            rep.headers[1].value = "text/plain";
-            rep.status = reply::ok;
+          	create_echo_response(buffer_.data(), bytes_transferred);
             write_response();
 
-          }
+          } // static 
           else if (result == request_parser::good)
           {
             request_handler_.handle_request(req, rep);
             write_response(); 
           }
-          else {
-            //TODO: Bad request
-          }
-
         }
       });
 }
 
+// Determines whether the input URL is /echo or /static
+std::string connection::parse_command(request req)
+{
+	std::string mode;
+	std::size_t first_slash_pos = req.uri.find_first_of("/"); 
+	for(char& c : req.uri.substr(first_slash_pos + 1)) {
+		if (c == '/'){
+		 	break; 
+		} 
+		mode += c;
+	}
+	return mode;
+}
+
+// Reads in the buffer_ data and constructs a reply with the proper echo headers and body
+void connection::create_echo_response(const char* data, std::size_t bytes_transferred)
+{
+	rep.content.append(data, bytes_transferred);
+    rep.headers.resize(2);
+    rep.headers[0].name = "Content-Length";
+    rep.headers[0].value = std::to_string(rep.content.size());
+    rep.headers[1].name = "Content-Type";
+    rep.headers[1].value = "text/plain";
+    rep.status = reply::ok;	
+}
 
 void connection::write_response()
 {

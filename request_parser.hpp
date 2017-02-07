@@ -2,6 +2,7 @@
 #define HTTP_REQUEST_PARSER_HPP
 
 #include <tuple>
+#include <iostream>
 
 namespace http {
 namespace server {
@@ -32,8 +33,9 @@ namespace server {
         while (begin != end)
         {
           result_type result = consume(req, *begin++);
-          if (result == good || result == bad)
+          if (result == good || result == bad) {
             return std::make_tuple(result, begin);
+          }
         }
         return std::make_tuple(indeterminate, begin);
       }

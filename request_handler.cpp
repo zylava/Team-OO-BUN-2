@@ -44,30 +44,11 @@ namespace server {
       return;
     }
 
-    std::string server_mode="";
-    std::size_t first_slash_pos = request_path.find_first_of("/"); 
-    int end_server_mode_pos = 1; 
-    for(char& c : request_path.substr(first_slash_pos + 1)) {
-      if (c == '/'){
-        break; 
-      } 
-      server_mode += c;
-      end_server_mode_pos++; 
-    }
-
-    //std::cout << server_mode << std::endl; 
-
-    //request_path = request_path.substr(first_slash_pos + end_server_mode_pos); 
-
-    //std::cout << "req.uri path = " << req.uri << std::endl; 
-    //std::cout << "request path = " << request_path << std::endl;
     // If path ends in slash (i.e. is a directory) then add "index.html".
     if (request_path[request_path.size() - 1] == '/')
     {
       request_path += "index.html";
     }
-
-    //std::cout << "2 request path = " << request_path << std::endl;
 
     // Determine the file extension.
     std::size_t last_slash_pos = request_path.find_last_of("/");
