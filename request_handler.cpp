@@ -16,6 +16,7 @@
 #include "reply.h"
 #include "request.hpp"
 #include <iostream> 
+#include <limits.h>
 
 namespace http {
 namespace server {
@@ -44,11 +45,27 @@ namespace server {
       return;
     }
 
+    //check if it is a directory (no file extension)
+    //if it is, add a '/' at the end
+    unsigned int last_slash_position = request_path.find_last_of("/");
+    unsigned int last_dot_position = request_path.find_last_of(".");
+    //if there are no dots in the path, then it becomes uint_max and is just a folder
+    //last && clause is an edge case to check if it is the root directory
+    if (last_dot_position != std::string::npos && last_dot_position == std::numeric_limits<unsigned int>::max() && last_slash_position == 0 
+      && request_path.length() != 1)
+    {
+      request_path += '/';
+    }
+
+    //std::cout << "Before Request path: " << request_path << std::endl; 
+
     // If path ends in slash (i.e. is a directory) then add "index.html".
     if (request_path[request_path.size() - 1] == '/')
     {
       request_path += "index.html";
     }
+
+    //std::cout << "Request path: " << request_path << std::endl; 
 
     // Determine the file extension.
     std::size_t last_slash_pos = request_path.find_last_of("/");

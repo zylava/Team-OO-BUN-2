@@ -18,111 +18,128 @@
         -:   16:#include "reply.h"
         -:   17:#include "request.hpp"
         -:   18:#include <iostream> 
-        -:   19:
-        -:   20:namespace http {
-        -:   21:namespace server {
-        -:   22:
-        6:   23:  request_handler::request_handler(const std::string& doc_root)
-        6:   24:    : doc_root_(doc_root)
-        -:   25:  {
-        6:   26:  }
-        -:   27:
-        3:   28:  void request_handler::handle_request(const request& req, reply& rep)
-        -:   29:  {
-        -:   30:    // Decode url to path.
-        4:   31:    std::string request_path;
-        -:   32:
-        3:   33:    if (!url_decode(req.uri, request_path))
-        -:   34:    {
-    #####:   35:      rep = reply::stock_reply(reply::bad_request);
-    #####:   36:      return;
-        -:   37:    }
-        -:   38:
-        -:   39:    // Request path must be absolute and not contain "..".
-        9:   40:    if (request_path.empty() || request_path[0] != '/'
-        5:   41:        || request_path.find("..") != std::string::npos)
-        -:   42:    {
-        1:   43:      rep = reply::stock_reply(reply::bad_request);
-        1:   44:      return;
-        -:   45:    }
-        -:   46:
-        -:   47:    // If path ends in slash (i.e. is a directory) then add "index.html".
-        2:   48:    if (request_path[request_path.size() - 1] == '/')
-        -:   49:    {
-    #####:   50:      request_path += "index.html";
-        -:   51:    }
-        -:   52:
-        -:   53:    // Determine the file extension.
-        2:   54:    std::size_t last_slash_pos = request_path.find_last_of("/");
-        2:   55:    std::size_t last_dot_pos = request_path.find_last_of(".");
-        3:   56:    std::string extension;
-        2:   57:    if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
-        -:   58:    {
-        2:   59:      extension = request_path.substr(last_dot_pos + 1);
-        -:   60:    }
+        -:   19:#include <limits.h>
+        -:   20:
+        -:   21:namespace http {
+        -:   22:namespace server {
+        -:   23:
+        6:   24:  request_handler::request_handler(const std::string& doc_root)
+        6:   25:    : doc_root_(doc_root)
+        -:   26:  {
+        6:   27:  }
+        -:   28:
+        3:   29:  void request_handler::handle_request(const request& req, reply& rep)
+        -:   30:  {
+        -:   31:    // Decode url to path.
+        4:   32:    std::string request_path;
+        -:   33:
+        3:   34:    if (!url_decode(req.uri, request_path))
+        -:   35:    {
+    #####:   36:      rep = reply::stock_reply(reply::bad_request);
+    #####:   37:      return;
+        -:   38:    }
+        -:   39:
+        -:   40:    // Request path must be absolute and not contain "..".
+        9:   41:    if (request_path.empty() || request_path[0] != '/'
+        5:   42:        || request_path.find("..") != std::string::npos)
+        -:   43:    {
+        1:   44:      rep = reply::stock_reply(reply::bad_request);
+        1:   45:      return;
+        -:   46:    }
+        -:   47:
+        -:   48:    //check if it is a directory (no file extension)
+        -:   49:    //if it is, add a '/' at the end
+        2:   50:    unsigned int last_slash_position = request_path.find_last_of("/");
+        2:   51:    unsigned int last_dot_position = request_path.find_last_of(".");
+        -:   52:    //if there are no dots in the path, then it becomes uint_max and is just a folder
+        -:   53:    //last && clause is an edge case to check if it is the root directory
+        4:   54:    if (last_dot_position != std::string::npos && last_dot_position == std::numeric_limits<unsigned int>::max() && last_slash_position == 0 
+        2:   55:      && request_path.length() != 1)
+        -:   56:    {
+    #####:   57:      request_path += '/';
+        -:   58:    }
+        -:   59:
+        -:   60:    //std::cout << "Before Request path: " << request_path << std::endl; 
         -:   61:
-        -:   62:    // Open the file to send back.
-        3:   63:    std::string full_path = doc_root_ + request_path;
-        -:   64:
-        2:   65:    std::cout << "full path = " << full_path << std::endl; 
-        -:   66:
-        3:   67:    std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
-        2:   68:    if (!is)
-        -:   69:    {
-        1:   70:      rep = reply::stock_reply(reply::not_found);
-        1:   71:      return;
-        -:   72:    }
-        -:   73:
-        -:   74:    // Fill out the reply to be sent to the client.
-        1:   75:    rep.status = reply::ok;
-        -:   76:    char buf[512];
-        3:   77:    while (is.read(buf, sizeof(buf)).gcount() > 0)
-        1:   78:      rep.content.append(buf, is.gcount());
-        1:   79:    rep.headers.resize(2);
-        1:   80:    rep.headers[0].name = "Content-Length";
-        1:   81:    rep.headers[0].value = std::to_string(rep.content.size());
-        1:   82:    rep.headers[1].name = "Content-Type";
-        1:   83:    rep.headers[1].value = mime_types::extension_to_type(extension);
-        -:   84:  }
-        -:   85:
-        3:   86:  bool request_handler::url_decode(const std::string& in, std::string& out)
-        -:   87:  {
-        3:   88:    out.clear();
-        3:   89:    out.reserve(in.size());
-       49:   90:    for (std::size_t i = 0; i < in.size(); ++i)
-        -:   91:    {
-       46:   92:      if (in[i] == '%')
-        -:   93:      {
-    #####:   94:        if (i + 3 <= in.size())
-        -:   95:        {
-    #####:   96:          int value = 0;
-    #####:   97:          std::istringstream is(in.substr(i + 1, 2));
-    #####:   98:          if (is >> std::hex >> value)
-        -:   99:          {
-    #####:  100:            out += static_cast<char>(value);
-    #####:  101:            i += 2;
-        -:  102:          }
-        -:  103:          else
-        -:  104:          {
-    #####:  105:            return false;
-        -:  106:          }
-        -:  107:        }
-        -:  108:        else
-        -:  109:        {
-    #####:  110:          return false;
-        -:  111:        }
-        -:  112:      }
-       46:  113:      else if (in[i] == '+')
-        -:  114:      {
-    #####:  115:        out += ' ';
-        -:  116:      }
-        -:  117:      else
-        -:  118:      {
-       46:  119:        out += in[i];
-        -:  120:      }
-        -:  121:    }
-        3:  122:    return true;
-        -:  123:  }
-        -:  124:
-        -:  125:  } // namespace server
-        3:  126:} // namespace http
+        -:   62:    // If path ends in slash (i.e. is a directory) then add "index.html".
+        2:   63:    if (request_path[request_path.size() - 1] == '/')
+        -:   64:    {
+    #####:   65:      request_path += "index.html";
+        -:   66:    }
+        -:   67:
+        -:   68:    //std::cout << "Request path: " << request_path << std::endl; 
+        -:   69:
+        -:   70:    // Determine the file extension.
+        2:   71:    std::size_t last_slash_pos = request_path.find_last_of("/");
+        2:   72:    std::size_t last_dot_pos = request_path.find_last_of(".");
+        3:   73:    std::string extension;
+        2:   74:    if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
+        -:   75:    {
+        2:   76:      extension = request_path.substr(last_dot_pos + 1);
+        -:   77:    }
+        -:   78:
+        -:   79:    // Open the file to send back.
+        3:   80:    std::string full_path = doc_root_ + request_path;
+        -:   81:
+        2:   82:    std::cout << "full path = " << full_path << std::endl; 
+        -:   83:
+        3:   84:    std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
+        2:   85:    if (!is)
+        -:   86:    {
+        1:   87:      rep = reply::stock_reply(reply::not_found);
+        1:   88:      return;
+        -:   89:    }
+        -:   90:
+        -:   91:    // Fill out the reply to be sent to the client.
+        1:   92:    rep.status = reply::ok;
+        -:   93:    char buf[512];
+        3:   94:    while (is.read(buf, sizeof(buf)).gcount() > 0)
+        1:   95:      rep.content.append(buf, is.gcount());
+        1:   96:    rep.headers.resize(2);
+        1:   97:    rep.headers[0].name = "Content-Length";
+        1:   98:    rep.headers[0].value = std::to_string(rep.content.size());
+        1:   99:    rep.headers[1].name = "Content-Type";
+        1:  100:    rep.headers[1].value = mime_types::extension_to_type(extension);
+        -:  101:  }
+        -:  102:
+        3:  103:  bool request_handler::url_decode(const std::string& in, std::string& out)
+        -:  104:  {
+        3:  105:    out.clear();
+        3:  106:    out.reserve(in.size());
+       49:  107:    for (std::size_t i = 0; i < in.size(); ++i)
+        -:  108:    {
+       46:  109:      if (in[i] == '%')
+        -:  110:      {
+    #####:  111:        if (i + 3 <= in.size())
+        -:  112:        {
+    #####:  113:          int value = 0;
+    #####:  114:          std::istringstream is(in.substr(i + 1, 2));
+    #####:  115:          if (is >> std::hex >> value)
+        -:  116:          {
+    #####:  117:            out += static_cast<char>(value);
+    #####:  118:            i += 2;
+        -:  119:          }
+        -:  120:          else
+        -:  121:          {
+    #####:  122:            return false;
+        -:  123:          }
+        -:  124:        }
+        -:  125:        else
+        -:  126:        {
+    #####:  127:          return false;
+        -:  128:        }
+        -:  129:      }
+       46:  130:      else if (in[i] == '+')
+        -:  131:      {
+    #####:  132:        out += ' ';
+        -:  133:      }
+        -:  134:      else
+        -:  135:      {
+       46:  136:        out += in[i];
+        -:  137:      }
+        -:  138:    }
+        3:  139:    return true;
+        -:  140:  }
+        -:  141:
+        -:  142:  } // namespace server
+        3:  143:} // namespace http
