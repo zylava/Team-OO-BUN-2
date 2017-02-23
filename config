@@ -1,9 +1,12 @@
-port 1080;
+# This is a comment.
 
-path /echo EchoHandler {
-	placeholder;
+port 2020;  # This is also a comment.
+
+path / StaticHandler {
+  root static;
 }
 
-path /static StaticFileHandler {
-	root ".";
-}
+path /echo EchoHandler {}
+
+# Default response handler if no handlers match.
+default NotFoundHandler {}

@@ -5,10 +5,8 @@
 #include <memory>
 #include <boost/asio.hpp>
 #include <string>
-#include "reply.h"
-#include "request.hpp"
 #include "request_handler.h"
-#include "request_parser.hpp"
+#include <map>
 
 namespace http {
 namespace server {
@@ -23,21 +21,17 @@ public:
   // connection(const connection&) = delete;
   // connection& operator=(const connection&) = delete;
 
-  explicit connection(boost::asio::ip::tcp::socket socket, request_handler& handler);
+  explicit connection(boost::asio::ip::tcp::socket socket, std::map <std::string, RequestHandler*> handlers);
 
   void start();
   
   void stop();
 
-  reply get_reply();
-  
-  int getConnectionStatus(); 
-  
+  Response get_reply();
+
   void write_response();
 
-  std::string parse_command(request& request);
-
-  void create_echo_response(const char* data, std::size_t bytes);
+  RequestHandler* parse_command(Request& request);
   
 private:
   void do_read();
@@ -48,27 +42,14 @@ private:
 
   std::array<char, MAX_BUFFER_SIZE> buffer_;
 
-  reply rep; 
+  Response rep; 
 
-  request req; 
-
-  enum connection_status
-  {
-    error = -1, 
-    unsuccessful = 0, 
-    success = 1
-  };
-
-  int connectionStatus;
+  Request req; 
 
   /// The handler used to process the incoming request.
-  request_handler& request_handler_;
-
-  request_parser request_parser_;
+  std::map <std::string, RequestHandler*> handlers_;
 
 };
-
-typedef std::shared_ptr<connection> connection_ptr;
 
 } // namespace server
 } // namespace http

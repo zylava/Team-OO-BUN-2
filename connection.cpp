@@ -1,20 +1,20 @@
-#include "connection.hpp"
+#include "connection.h"
 #include <utility>
 #include <vector>
 #include <iostream> 
 #include "request_handler.h"
+#include <boost/asio.hpp>
 
 namespace http {
 namespace server {
 
-connection::connection(boost::asio::ip::tcp::socket socket, request_handler& handler)
-  : socket_(std::move(socket)), request_handler_(handler)
+connection::connection(boost::asio::ip::tcp::socket socket, std::map <std::string, RequestHandler*> handlers)
+  : socket_(std::move(socket)), handlers_(handlers)
 {
 }
 
 void connection::start()
 {
-  connectionStatus = connection::success; 
   do_read();
 }
 
@@ -24,12 +24,7 @@ void connection::stop()
   io_service_.stop();
 }
 
-int connection::getConnectionStatus()
-{
-  return connectionStatus; 
-}
-
-reply connection::get_reply()
+Response connection::get_reply()
 {
   return rep;
 }
@@ -42,58 +37,58 @@ void connection::do_read()
       {
         if (!ec)
         {
-          request_parser::result_type result;
-          std::tie(result, std::ignore) = request_parser_.parse(
-          	req, buffer_.data(), buffer_.data() + bytes_transferred);
+          // Turn the request buffer into a string
+          std::string s = "";
+          s.append(buffer_.data(), buffer_.data() + bytes_transferred);
 
-          // Determine /echo or /static
-          std::string server_mode = parse_command(req);
+          // Parse the request
+          std::unique_ptr<Request> request = Request::Parse(s); 
 
-          // echo
-          if (result == request_parser::good && server_mode == "echo"){
-          	create_echo_response(buffer_.data(), bytes_transferred);
+          req = *request;
+
+          // Determine the file handler needed
+          RequestHandler* server_mode = parse_command(req);
+
+          // Check if the parser returned null
+          if (server_mode != nullptr) {
+            // Check if the request handler returned not found
+            if (server_mode->HandleRequest(req, &rep) == RequestHandler::Status::NOT_FOUND){
+              // Call the default/not found handler
+              handlers_["default"]->HandleRequest(req, &rep);
+            }
+            // Write back to the client
             write_response();
-
-          } // static 
-          else if (result == request_parser::good)
-          {
-            request_handler_.handle_request(req, rep);
-            write_response(); 
           }
         }
       });
 }
 
-// Determines whether the input URL is /echo or /static
-std::string connection::parse_command(request req)
+// Determines which handler the input uri should use
+RequestHandler* connection::parse_command(Request& req)
 {
-	std::string mode;
-	std::size_t first_slash_pos = req.uri.find_first_of("/"); 
-	for(char& c : req.uri.substr(first_slash_pos + 1)) {
-		if (c == '/'){
-		 	break; 
-		} 
-		mode += c;
-	}
-	return mode;
+	std::string mode = req.uri();
+
+  // Go backward from the end of the uri
+  for (int index = mode.length(); index > 0; index--) {
+    // Update the size of the uri string 
+    mode.resize(index);
+
+    // Find longest matching path in the handlers
+    if (handlers_.find(mode) != handlers_.end()) {
+      // Found: return pointer to the handler
+      RequestHandler* handler = handlers_[mode];
+      return handler;
+    }
+  }
+  // No matching handler found, return nullptr
+  return nullptr;
 }
 
-// Reads in the buffer_ data and constructs a reply with the proper echo headers and body
-void connection::create_echo_response(const char* data, std::size_t bytes_transferred)
-{
-	rep.content.append(data, bytes_transferred);
-    rep.headers.resize(2);
-    rep.headers[0].name = "Content-Length";
-    rep.headers[0].value = std::to_string(rep.content.size());
-    rep.headers[1].name = "Content-Type";
-    rep.headers[1].value = "text/plain";
-    rep.status = reply::ok;	
-}
-
+// Write response to the client
 void connection::write_response()
 {
   auto self(shared_from_this());
-  boost::asio::async_write(socket_, rep.to_buffers(),
+  boost::asio::async_write(socket_, boost::asio::buffer(rep.ToString()),
       [this, self](boost::system::error_code ec, std::size_t)
       {
         if (!ec)
