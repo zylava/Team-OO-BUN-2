@@ -4,6 +4,7 @@
 #include <iostream> 
 #include "request_handler.h"
 #include <boost/asio.hpp>
+#include "server_monitor.h"
 
 namespace http {
 namespace server {
@@ -56,6 +57,8 @@ void connection::do_read()
               // Call the default/not found handler
               handlers_["default"]->HandleRequest(req, &rep);
             }
+
+            ServerMonitor::getInstance()->addRequest(req.uri(), rep.GetStatus());
             // Write back to the client
             write_response();
           }

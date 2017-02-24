@@ -17,7 +17,6 @@ namespace server {
 	  	response->AddHeader("Content-Type", "text/html");
 	  	response->AddHeader("Content-Length", std::to_string(not_found_response.length()));
 	  	response->SetBody(not_found_response);
-	  	response->SetVersion(request.version());
 	  	
 	return RequestHandler::Status::NOT_FOUND;
   	}

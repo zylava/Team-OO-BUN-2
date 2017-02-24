@@ -10,3 +10,6 @@ path /echo EchoHandler {}
 
 # Default response handler if no handlers match.
 default NotFoundHandler {}
+
+# Status handler
+path /status StatusHandler {}

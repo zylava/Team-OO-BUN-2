@@ -14,7 +14,7 @@ std::unique_ptr<Request> Request::Parse(const std::string& raw_request) {
     std::stringstream stream;
     stream << raw_request;
     std::vector<std::string> request_lines;
-    
+
     // Read only if the raw request is not empty
     if (!raw_request.empty()) {
       for (std::string line; std::getline(stream, line, '\n'); ) {
@@ -23,7 +23,7 @@ std::unique_ptr<Request> Request::Parse(const std::string& raw_request) {
     }
 
     // Parse all the lines of the request into their proper member variables
-    for (int i = 0; i < (int) request_lines.size() - 1; i++) {
+    for (int i = 0; i < (int) request_lines.size(); i++) {
         if (i == 0) {
           // The first line contains the method, uri, and version separated by spaces
           auto find_method = request_lines[i].find(" ");
@@ -37,7 +37,7 @@ std::unique_ptr<Request> Request::Parse(const std::string& raw_request) {
           new_request->m_uri = rest_of_first_line.substr(0, find_uri);
 
           // The version is the rest of the first line
-          new_request->m_version = rest_of_first_line.substr(find_uri + 1);
+          new_request->m_version = rest_of_first_line.substr(find_uri + 1, rest_of_first_line.length() - 1);
         } 
         else if (!request_lines.empty()) {
           // The rest of the request contains a header name, a colon, a space, and its values
@@ -48,7 +48,7 @@ std::unique_ptr<Request> Request::Parse(const std::string& raw_request) {
 
             // The values immediate follow a colon and a space
             std::string header_value = request_lines[i].substr(colon + 2);
-            new_request->m_headers.push_back(std::make_pair(header_name, header_value.substr(0, header_value.length()-1)));
+            new_request->m_headers.push_back(std::make_pair(header_name, header_value.substr(0, header_value.length() - 1)));
           }
         } 
         else {

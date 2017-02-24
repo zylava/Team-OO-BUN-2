@@ -18,8 +18,8 @@ namespace http {
 			content = body; 
 		}
 
-		void Response::SetVersion(const std::string& version) {
-			mVersion = version;
+		Response::ResponseCode Response::GetStatus(){
+			return responseStatus;
 		}
 
 		std::string Response::ToString() {
@@ -27,13 +27,13 @@ namespace http {
 
 			switch(responseStatus) {
 				case OK:
-					responseString += mVersion + " 200 OK\r\n";
+					responseString += "HTTP/1.1 200 OK\r\n";
 					break; 
 				case BAD_REQUEST: 
-					responseString += mVersion + " 400 Bad Request\r\n";
+					responseString += "HTTP/1.1 400 Bad Request\r\n";
 					break;
 				case NOT_FOUND:
-					responseString += mVersion + " 404 Not Found\r\n";
+					responseString += "HTTP/1.1 404 Not Found\r\n";
 					break;
 			}
 

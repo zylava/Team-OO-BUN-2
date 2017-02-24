@@ -16,7 +16,6 @@ namespace server {
 	  	response->AddHeader("Content-Type", "text/plain");
 	  	response->AddHeader("Content-Length", std::to_string(request.raw_request().length()));
 	  	response->SetBody(request.raw_request());
-	  	response->SetVersion(request.version());
 	  	
 	return RequestHandler::Status::OK;
 	}

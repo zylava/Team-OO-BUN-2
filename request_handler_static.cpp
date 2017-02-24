@@ -28,8 +28,6 @@ namespace http {
 
         std::string request_path;
 
-        response->SetVersion(request.version());
-
         // Try to decode the uri that was passed in
         if (!url_decode(request.uri(), request_path))
         {
