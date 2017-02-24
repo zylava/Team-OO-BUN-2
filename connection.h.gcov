@@ -1,5 +1,9 @@
         -:    0:Source:connection.h
+<<<<<<< HEAD
         -:    0:Programs:2
+=======
+        -:    0:Programs:4
+>>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:    1:#ifndef CONNECTION_H
         -:    2:#define CONNECTION_H
         -:    3:

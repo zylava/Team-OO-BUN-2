@@ -8,6 +8,7 @@
 #include "request_handler_default.h"
 #include "request_handler_echo.h"
 #include "request_handler_static.h"
+#include "request_handler_status.h"
 
 
 namespace http {
@@ -31,6 +32,15 @@ namespace server {
             std::string echo_handler = statement->tokens_[i+2];
             NginxConfig echo_config;
             path_info["/echo"] = std::make_pair(echo_handler, echo_config);
+            ServerMonitor::getInstance()->addHandler(statement->tokens_[i+2], statement->tokens_[i+1]); 
+          }
+
+          else if (statement->tokens_[i]=="path" && statement->tokens_[i+1]=="/status"){
+            std::string status_handler = statement->tokens_[i+2];
+            NginxConfig status_config;
+            path_info["/status"] = std::make_pair(status_handler, status_config);
+            ServerMonitor::getInstance()->addHandler(statement->tokens_[i+2], statement->tokens_[i+1]); 
+
           }
 
           else if (statement->tokens_[i]=="path"){
@@ -40,11 +50,13 @@ namespace server {
 
             NginxConfig child = *(statement->child_block_);
             path_info[path] = std::make_pair(static_handler, child);
+            ServerMonitor::getInstance()->addHandler(statement->tokens_[i+2], statement->tokens_[i+1]); 
           }
 
           else if (statement->tokens_[i]=="default"){ 
               NginxConfig default_config;
               path_info["default"]= std::make_pair(statement->tokens_[i+1], default_config);
+              ServerMonitor::getInstance()->addHandler(statement->tokens_[i+1], ""); 
           }
 
         }

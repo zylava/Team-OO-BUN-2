@@ -18,8 +18,8 @@ namespace http {
 			content = body; 
 		}
 
-		void Response::SetVersion(const std::string& version) {
-			mVersion = version;
+		Response::ResponseCode Response::GetStatus(){
+			return responseStatus;
 		}
 
 		std::string Response::ToString() {

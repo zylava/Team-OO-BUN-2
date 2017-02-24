@@ -1,5 +1,9 @@
         -:    0:Source:request_handler_default.h
+<<<<<<< HEAD
         -:    0:Programs:2
+=======
+        -:    0:Programs:4
+>>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:    1:#ifndef DEFAULT_HANDLER_H
         -:    2:#define DEFAULT_HANDLER_H
         -:    3:
@@ -8,14 +12,22 @@
         -:    6:
         -:    7:namespace http {
         -:    8:	namespace server {
+<<<<<<< HEAD
         7:    9:		class NotFoundHandler : public RequestHandler {
+=======
+    #####:    9:		class NotFoundHandler : public RequestHandler {
+>>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:   10:		public: 
         -:   11:			Status Init(const std::string& uri_prefix, const NginxConfig& config) override;
         -:   12:
         -:   13:  			Status HandleRequest(const Request& request, Response* response) override;
         -:   14:		};
         -:   15:
+<<<<<<< HEAD
         2:   16:		REGISTER_REQUEST_HANDLER(NotFoundHandler);
+=======
+        1:   16:		REGISTER_REQUEST_HANDLER(NotFoundHandler);
+>>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:   17:	} // namespace server
         -:   18:} // namespace http
         -:   19:

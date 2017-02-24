@@ -1,5 +1,9 @@
         -:    0:Source:ngnix/config_parser.h
+<<<<<<< HEAD
         -:    0:Programs:2
+=======
+        -:    0:Programs:4
+>>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:    1:// An nginx config file parser.
         -:    2:
         -:    3:#include <iostream>
@@ -18,7 +22,11 @@
         -:   16:};
         -:   17:
         -:   18:// The parsed representation of the entire config.
+<<<<<<< HEAD
        40:   19:class NginxConfig {
+=======
+    #####:   19:class NginxConfig {
+>>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:   20: public:
         -:   21:  std::string ToString(int depth = 0);
         -:   22:  std::vector<std::shared_ptr<NginxConfigStatement>> statements_;
