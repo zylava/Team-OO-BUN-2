@@ -1,0 +1,23 @@
+        -:    0:Source:request_handler_echo.h
+        -:    0:Programs:2
+        -:    1:#ifndef ECHO_HANDLER_H
+        -:    2:#define ECHO_HANDLER_H
+        -:    3:
+        -:    4:#include "request_handler.h"
+        -:    5:#include <iostream> 
+        -:    6:
+        -:    7:namespace http {
+        -:    8:	namespace server {
+    #####:    9:		class EchoHandler : public RequestHandler {
+        -:   10:		public: 
+        -:   11:			Status Init(const std::string& uri_prefix, const NginxConfig& config) override;
+        -:   12:
+        -:   13:  			Status HandleRequest(const Request& request, Response* response) override;
+        -:   14:		};
+        -:   15:
+        -:   16:
+        1:   17:		REGISTER_REQUEST_HANDLER(EchoHandler);
+        -:   18:	} // namespace server
+        -:   19:} // namespace http
+        -:   20:
+        -:   21:#endif  // ECHO_HANDLER_H

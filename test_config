@@ -1,8 +1,7 @@
-port 1080;
+port 2020;
 
-path /echo EchoHandler {
-    placeholder;
+path / StaticHandler {
+   root static;
 }
-path /static StaticFileHandler {
-    root ".";
-}
+path /echo EchoHandler {}
+default NotFoundHandler {}

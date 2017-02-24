@@ -21,8 +21,6 @@ namespace server {
       // map from path -> (handler_name, root)
       std::map <std::string, std::pair<std::string,NginxConfig>> path_info;
 
-      std::string portNum_ = "";
-
       for (const auto& statement : config.statements_) {
         for (unsigned int i = 0; i < statement->tokens_.size(); ++i) {
 
@@ -152,5 +150,12 @@ namespace server {
         });
     }
 
+    bool server::create_connection(boost::system::error_code ec){
+      isRunning = true;
+      if (ec == 0)
+        return true;
+      else
+        return false;
+    }
   }
 }

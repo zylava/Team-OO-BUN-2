@@ -2,7 +2,7 @@
 #define MOCKCONNECTION_H
 
 #include "gmock/gmock.h" 
-#include "connection.hpp"
+#include "connection.h"
 #include <boost/asio.hpp>
 #include <string>
 

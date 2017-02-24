@@ -21,7 +21,7 @@ namespace server {
       void run(); 
       bool getStatus(); 
       void do_await_stop();
-      //bool create_connection(const boost::system::error_code& ec);
+      bool create_connection(boost::system::error_code ec);
       std::string getPortNum(); 
       std::string getAddress();  
 
