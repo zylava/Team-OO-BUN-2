@@ -1,8 +1,0 @@
-port 1080;
-
-path /echo EchoHandler {
-    placeholder;
-}
-path /static StaticFileHandler {
-    root ".";
-}

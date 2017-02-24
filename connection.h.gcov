@@ -1,0 +1,59 @@
+        -:    0:Source:connection.h
+        -:    0:Programs:4
+        -:    1:#ifndef CONNECTION_H
+        -:    2:#define CONNECTION_H
+        -:    3:
+        -:    4:#include <array>
+        -:    5:#include <memory>
+        -:    6:#include <boost/asio.hpp>
+        -:    7:#include <string>
+        -:    8:#include "request_handler.h"
+        -:    9:#include <map>
+        -:   10:
+        -:   11:namespace http {
+        -:   12:namespace server {
+        -:   13:
+        -:   14:// 8192 is maximum size of a package sent on a network
+        -:   15:static const int MAX_BUFFER_SIZE = 8192;
+        -:   16:
+    #####:   17:class connection : public std::enable_shared_from_this<connection>
+        -:   18:{
+        -:   19:public:
+        -:   20:  // Does not allow us to make copies of this class
+        -:   21:  // connection(const connection&) = delete;
+        -:   22:  // connection& operator=(const connection&) = delete;
+        -:   23:
+        -:   24:  explicit connection(boost::asio::ip::tcp::socket socket, std::map <std::string, RequestHandler*> handlers);
+        -:   25:
+        -:   26:  void start();
+        -:   27:  
+        -:   28:  void stop();
+        -:   29:
+        -:   30:  Response get_reply();
+        -:   31:
+        -:   32:  void write_response();
+        -:   33:
+        -:   34:  RequestHandler* parse_command(Request& request);
+        -:   35:  
+        -:   36:private:
+        -:   37:  void do_read();
+        -:   38:
+        -:   39:  boost::asio::io_service io_service_;
+        -:   40:
+        -:   41:  boost::asio::ip::tcp::socket socket_;
+        -:   42:
+        -:   43:  std::array<char, MAX_BUFFER_SIZE> buffer_;
+        -:   44:
+        -:   45:  Response rep; 
+        -:   46:
+        -:   47:  Request req; 
+        -:   48:
+        -:   49:  /// The handler used to process the incoming request.
+        -:   50:  std::map <std::string, RequestHandler*> handlers_;
+        -:   51:
+        -:   52:};
+        -:   53:
+        -:   54:} // namespace server
+        -:   55:} // namespace http
+        -:   56:
+        -:   57:#endif // HTTP_CONNECTION_HPP

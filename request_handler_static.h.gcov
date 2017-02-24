@@ -1,0 +1,25 @@
+        -:    0:Source:request_handler_static.h
+        -:    0:Programs:4
+        -:    1:#ifndef STATIC_FILE_HANDLER_H
+        -:    2:#define STATIC_FILE_HANDLER_H
+        -:    3:
+        -:    4:#include "request_handler.h"
+        -:    5:#include <iostream>
+        -:    6:
+        -:    7:namespace http {
+        -:    8:	namespace server {
+        4:    9:		class StaticHandler : public RequestHandler {
+        -:   10:		public: 
+        -:   11:			Status Init(const std::string& uri_prefix, const NginxConfig& config) override;
+        -:   12:
+        -:   13:  			Status HandleRequest(const Request& request, Response* response) override;
+        -:   14:  			
+        -:   15:  		private:
+        -:   16:  			bool url_decode(const std::string& in, std::string& out);
+        -:   17:		};
+        -:   18:
+        2:   19:		REGISTER_REQUEST_HANDLER(StaticHandler);
+        -:   20:	} // namespace server
+        -:   21:} // namespace http
+        -:   22:
+        -:   23:#endif

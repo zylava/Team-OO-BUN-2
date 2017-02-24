@@ -1,5 +1,5 @@
         -:    0:Source:request_handler.h
-        -:    0:Programs:2
+        -:    0:Programs:4
         -:    1:// For the Request and Response classes, you need to implement the methods
         -:    2:// and add private data as appropriate. You may also need to modify or extend
         -:    3:// the API when implementing the reverse proxy. Use your good judgment.
@@ -19,14 +19,14 @@
         -:   17:namespace http {
         -:   18:  namespace server {
         -:   19:
-        6:   20:class Request {
+    #####:   20:class Request {
         -:   21: public:
         -:   22:  static std::unique_ptr<Request> Parse(const std::string& raw_request);
         -:   23:
         -:   24:  // Getters
         -:   25:  std::string raw_request() const { return m_raw_request; }
         -:   26:  std::string method() const { return m_method; }
-        1:   27:  std::string uri() const { return m_uri; };
+    #####:   27:  std::string uri() const { return m_uri; };
         -:   28:  std::string version() const { return m_version; }
         -:   29:
         -:   30:  using Headers = std::vector<std::pair<std::string, std::string>>;
@@ -68,7 +68,7 @@
         -:   66:  void AddHeader(const std::string& header_name, const std::string& header_value);
         -:   67:  void SetBody(const std::string& body);
         -:   68:  
-        -:   69:  void SetVersion(const std::string& version);
+        -:   69:  ResponseCode GetStatus();   
         -:   70:
         -:   71:  std::string ToString();
         -:   72:
@@ -81,7 +81,7 @@
         -:   79:
         -:   80:// Represents the parent of all request handlers. Implementations should expect to
         -:   81:// be long lived and created at server constrution.
-        -:   82:class RequestHandler {
+    #####:   82:class RequestHandler {
         -:   83: public:
         -:   84:  enum Status {
         -:   85:    OK = 0,
@@ -117,14 +117,14 @@
         -:  115:template<typename T>
         -:  116:class RequestHandlerRegisterer {
         -:  117: public:
-        -:  118:  RequestHandlerRegisterer(const std::string& type) {
-        -:  119:    if (request_handler_builders == nullptr) {
-        -:  120:      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
+        6:  118:  RequestHandlerRegisterer(const std::string& type) {
+        6:  119:    if (request_handler_builders == nullptr) {
+    #####:  120:      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
         -:  121:    }
-        -:  122:    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
-        -:  123:  }
-        -:  124:  static RequestHandler* Create() {
-        -:  125:    return new T;
+        6:  122:    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
+        6:  123:  }
+        6:  124:  static RequestHandler* Create() {
+        6:  125:    return new T;
         -:  126:  }
         -:  127:};
         -:  128:

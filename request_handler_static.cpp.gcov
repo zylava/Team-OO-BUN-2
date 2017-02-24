@@ -1,0 +1,150 @@
+        -:    0:Source:request_handler_static.cpp
+        -:    0:Programs:4
+        -:    1:#include "request_handler_static.h"
+        -:    2:#include <sstream> 
+        -:    3:#include <fstream>
+        -:    4:
+        -:    5:namespace http {
+        -:    6:  namespace server {
+        -:    7:
+        4:    8:    RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix, const NginxConfig& config) {
+        -:    9:
+        4:   10:        mUri_prefix = uri_prefix;
+        -:   11:
+        -:   12:        std::vector<std::shared_ptr<NginxConfigStatement>> statements = 
+        8:   13:                                config.statements_;
+        8:   14:        for (unsigned int j = 0; j < statements.size(); ++j) {
+       12:   15:          for (unsigned int k = 0; k < statements[j]->tokens_.size(); ++k) {
+        8:   16:            if (statements[j]->tokens_[k]=="root") {
+        4:   17:              mRoot = statements[j]->tokens_[k+1];
+        -:   18:            }
+        -:   19:          }
+        -:   20:        }
+        -:   21:
+        -:   22:        //TODO: error handling for empty prefix
+        8:   23:        return Status::OK;
+        -:   24:    }
+        -:   25:
+        3:   26:    RequestHandler::Status StaticHandler::HandleRequest(const Request& request, Response* response) {
+        3:   27:        std::cout << "StaticFileHandler::HandleRequest called" << std::endl;
+        -:   28:
+        6:   29:        std::string request_path;
+        -:   30:
+        -:   31:        // Try to decode the uri that was passed in
+        3:   32:        if (!url_decode(request.uri(), request_path))
+        -:   33:        {
+    #####:   34:          response->SetStatus(Response::ResponseCode::BAD_REQUEST);
+    #####:   35:          response->SetBody("Bad Request: Bad url decoding");  
+    #####:   36:          return RequestHandler::Status::BAD_REQUEST;
+        -:   37:        }
+        -:   38:
+        -:   39:        // Request path must be absolute and not contain "..".
+        8:   40:        if (request_path.empty() || request_path[0] != '/'
+        5:   41:            || request_path.find("..") != std::string::npos)
+        -:   42:        {
+        1:   43:          response->SetStatus(Response::ResponseCode::BAD_REQUEST);
+        1:   44:          response->SetBody("Bad Request: Bad pathing"); 
+        1:   45:          return RequestHandler::Status::BAD_REQUEST;
+        -:   46:        }
+        -:   47:
+        -:   48:        // Direct to default page
+        2:   49:        if (request_path[request_path.size() - 1] == '/')
+        -:   50:        {
+        1:   51:          request_path += "index.html";
+        -:   52:        }
+        -:   53:
+        -:   54:        // Find the extension of the file request
+        2:   55:        std::size_t last_slash_pos = request_path.find_last_of("/");
+        2:   56:        std::size_t last_dot_pos = request_path.find_last_of(".");
+        4:   57:        std::string extension;
+        2:   58:        if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
+        -:   59:        {
+        1:   60:          extension = request_path.substr(last_dot_pos + 1);
+        -:   61:        }
+        -:   62:
+        -:   63:        // Types of supported file extensions from mime_types
+        4:   64:        std::string extension_type; 
+        2:   65:        if(extension == "jpg"){
+    #####:   66:          extension_type = "image/jpeg"; 
+        -:   67:        }
+        2:   68:        else if (extension == "gif"){
+    #####:   69:          extension_type = "image/gif";
+        -:   70:        }
+        2:   71:        else if (extension == "htm") {
+    #####:   72:          extension_type = "text/html"; 
+        -:   73:        }
+        2:   74:        else if (extension == "html") {
+        1:   75:          extension_type = "text/html"; 
+        -:   76:        }
+        1:   77:        else if (extension == "png") {
+    #####:   78:          extension_type == "image/png"; 
+        -:   79:        }
+        -:   80:
+        -:   81:        // Open the file to send back.
+        4:   82:        std::string full_path = mRoot + request_path;
+        -:   83:
+        2:   84:        std::cout << "full path = " << full_path << std::endl; 
+        -:   85:
+        4:   86:        std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
+        2:   87:        if (!is)
+        -:   88:        {
+        1:   89:          response->SetStatus(Response::ResponseCode::NOT_FOUND);
+        1:   90:          response->SetBody("NOT FOUND"); 
+        1:   91:          return RequestHandler::Status::NOT_FOUND;
+        -:   92:        }
+        -:   93:
+        2:   94:        std::string contents = ""; 
+        2:   95:        std::stringstream sstr;
+        1:   96:        sstr << is.rdbuf();
+        1:   97:        contents = sstr.str();
+        -:   98:
+        -:   99:        //Good response, fill out the response 
+        1:  100:        response->SetStatus(Response::ResponseCode::OK);
+        1:  101:        response->SetBody(contents);
+        1:  102:        response->AddHeader("Content-Length", std::to_string(contents.length())); 
+        1:  103:        response->AddHeader("Content-Type", extension_type); 
+        -:  104:
+        1:  105:        return RequestHandler::Status::OK;
+        -:  106:      }
+        -:  107:
+        3:  108:    bool StaticHandler::url_decode(const std::string& in, std::string& out)
+        -:  109:    {
+        3:  110:      out.clear();
+        3:  111:      out.reserve(in.size());
+       12:  112:      for (std::size_t i = 0; i < in.size(); ++i)
+        -:  113:      {
+        9:  114:        if (in[i] == '%')
+        -:  115:        {
+    #####:  116:          if (i + 3 <= in.size())
+        -:  117:          {
+    #####:  118:            int value = 0;
+    #####:  119:            std::istringstream is(in.substr(i + 1, 2));
+    #####:  120:            if (is >> std::hex >> value)
+        -:  121:            {
+    #####:  122:              out += static_cast<char>(value);
+    #####:  123:              i += 2;
+        -:  124:            }
+        -:  125:            else
+        -:  126:            {
+    #####:  127:              return false;
+        -:  128:            }
+        -:  129:          }
+        -:  130:          else
+        -:  131:          {
+    #####:  132:            return false;
+        -:  133:          }
+        -:  134:        }
+        9:  135:        else if (in[i] == '+')
+        -:  136:        {
+    #####:  137:          out += ' ';
+        -:  138:        }
+        -:  139:        else
+        -:  140:        {
+        9:  141:          out += in[i];
+        -:  142:        }
+        -:  143:      }
+        3:  144:      return true;
+        -:  145:    }
+        -:  146:
+        -:  147:  } // namespace server
+        3:  148:} // namespace http

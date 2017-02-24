@@ -37,6 +37,14 @@ namespace server {
             ServerMonitor::getInstance()->addHandler(statement->tokens_[i+2], statement->tokens_[i+1]); 
           }
 
+          else if (statement->tokens_[i]=="path" && statement->tokens_[i+1]=="/status"){
+            std::string status_handler = statement->tokens_[i+2];
+            NginxConfig status_config;
+            path_info["/status"] = std::make_pair(status_handler, status_config);
+            ServerMonitor::getInstance()->addHandler(statement->tokens_[i+2], statement->tokens_[i+1]); 
+
+          }
+
           else if (statement->tokens_[i]=="path"){
 
             std::string path = statement->tokens_[i+1];
@@ -51,14 +59,6 @@ namespace server {
               NginxConfig default_config;
               path_info["default"]= std::make_pair(statement->tokens_[i+1], default_config);
               ServerMonitor::getInstance()->addHandler(statement->tokens_[i+1], ""); 
-          }
-
-          else if (statement->tokens_[i]=="path" && statement->tokens_[i+1]=="/status"){
-            std::string status_handler = statement->tokens_[i+2];
-            NginxConfig status_config;
-            path_info["/status"] = std::make_pair(status_handler, status_config);
-            ServerMonitor::getInstance()->addHandler(statement->tokens_[i+2], statement->tokens_[i+1]); 
-
           }
 
         }

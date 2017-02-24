@@ -39,7 +39,7 @@ TEST(RequestTest, RequestHeaderTest)
 	std::pair<std::string, std::string> fourth_header = std::make_pair("Accept-Encoding", "gzip, deflate");
 	std::pair<std::string, std::string> fifth_header = std::make_pair("Connection", "keep-alive");
 
-	std::cout << head.size() << std::endl;
+	//std::cout << head.size() << std::endl;
 
 	EXPECT_EQ(head[0], first_header);
 	EXPECT_EQ(head[4], fourth_header);
