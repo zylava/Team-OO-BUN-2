@@ -27,11 +27,15 @@ public:
   
   void stop();
 
-  Response get_reply();
+  Response get_response();
 
   void write_response();
 
-  RequestHandler* parse_command(Request& request);
+  Request call_parser(std::string data);
+
+  RequestHandler* find_handler(Request& request);
+
+  RequestHandler::Status call_handler(RequestHandler* handler_mode);
   
 private:
   void do_read();
@@ -42,7 +46,7 @@ private:
 
   std::array<char, MAX_BUFFER_SIZE> buffer_;
 
-  Response rep; 
+  Response res; 
 
   Request req; 
 

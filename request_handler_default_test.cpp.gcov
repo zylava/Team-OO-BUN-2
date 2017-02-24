@@ -1,0 +1,29 @@
+        -:    0:Source:request_handler_default_test.cpp
+        -:    0:Programs:7
+        -:    1:#include "gtest/gtest.h"
+        -:    2:#include "gmock/gmock.h"
+        -:    3:#include "request_handler_default.h"
+        -:    4:#include <boost/asio.hpp>
+        -:    5:
+        -:    6:namespace http{
+        -:    7:	namespace server {
+        5:    8:		TEST(DefaultHandler, NotFoundStatusTest) {
+        1:    9:			const std::string uri_prefix = "/echo";
+        1:   10:			NginxConfigParser config_parser;
+        2:   11:			NginxConfig config;
+        1:   12:			config_parser.Parse("config", &config);
+        2:   13:			NotFoundHandler test;
+        1:   14:			RequestHandler::Status status = test.Init(uri_prefix, config);
+        2:   15:			EXPECT_EQ(status, RequestHandler::Status::NOT_FOUND);
+        1:   16:		}
+        -:   17:
+        5:   18:		TEST(DefaultHandler, DefaultHandleRequestTest) {
+        1:   19:			Request request;
+        2:   20:			Response response;
+        2:   21:			NotFoundHandler test;
+        1:   22:			RequestHandler::Status status = test.HandleRequest(request, &response);
+        2:   23:			EXPECT_EQ(status, RequestHandler::Status::NOT_FOUND);
+        1:   24:		}
+        -:   25:	}
+        3:   26:}
+        -:   27:

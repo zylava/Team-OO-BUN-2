@@ -1,9 +1,5 @@
         -:    0:Source:request_handler_static.h
-<<<<<<< HEAD
-        -:    0:Programs:2
-=======
-        -:    0:Programs:4
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
+        -:    0:Programs:7
         -:    1:#ifndef STATIC_FILE_HANDLER_H
         -:    2:#define STATIC_FILE_HANDLER_H
         -:    3:
@@ -12,11 +8,7 @@
         -:    6:
         -:    7:namespace http {
         -:    8:	namespace server {
-<<<<<<< HEAD
-    #####:    9:		class StaticHandler : public RequestHandler {
-=======
-        4:    9:		class StaticHandler : public RequestHandler {
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
+        9:    9:		class StaticHandler : public RequestHandler {
         -:   10:		public: 
         -:   11:			Status Init(const std::string& uri_prefix, const NginxConfig& config) override;
         -:   12:
@@ -26,11 +18,7 @@
         -:   16:  			bool url_decode(const std::string& in, std::string& out);
         -:   17:		};
         -:   18:
-<<<<<<< HEAD
-        1:   19:		REGISTER_REQUEST_HANDLER(StaticHandler);
-=======
         2:   19:		REGISTER_REQUEST_HANDLER(StaticHandler);
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:   20:	} // namespace server
         -:   21:} // namespace http
         -:   22:

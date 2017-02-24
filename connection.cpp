@@ -25,9 +25,9 @@ void connection::stop()
   io_service_.stop();
 }
 
-Response connection::get_reply()
+Response connection::get_response()
 {
-  return rep;
+  return res;
 }
 
 void connection::do_read()
@@ -42,32 +42,28 @@ void connection::do_read()
           std::string s = "";
           s.append(buffer_.data(), buffer_.data() + bytes_transferred);
 
-          // Parse the request
-          std::unique_ptr<Request> request = Request::Parse(s); 
-
-          req = *request;
+          // Create a request object of the parsed object
+          call_parser(s);
 
           // Determine the file handler needed
-          RequestHandler* server_mode = parse_command(req);
+          RequestHandler* server_mode = find_handler(req);
 
-          // Check if the parser returned null
-          if (server_mode != nullptr) {
-            // Check if the request handler returned not found
-            if (server_mode->HandleRequest(req, &rep) == RequestHandler::Status::NOT_FOUND){
-              // Call the default/not found handler
-              handlers_["default"]->HandleRequest(req, &rep);
-            }
-
-            ServerMonitor::getInstance()->addRequest(req.uri(), rep.GetStatus());
-            // Write back to the client
-            write_response();
-          }
+          // Call the request handler that matches the request
+          call_handler(server_mode);
         }
       });
 }
 
+// Parse the input buffer into a pointer to a request object
+Request connection::call_parser(std::string s)
+{
+  // Parse the request
+  req = *(Request::Parse(s));
+  return req;
+} 
+
 // Determines which handler the input uri should use
-RequestHandler* connection::parse_command(Request& req)
+RequestHandler* connection::find_handler(Request& req)
 {
 	std::string mode = req.uri();
 
@@ -87,11 +83,33 @@ RequestHandler* connection::parse_command(Request& req)
   return nullptr;
 }
 
+// Call the handler that is associated with the current request
+RequestHandler::Status connection::call_handler(RequestHandler* handler_mode)
+{
+  RequestHandler::Status status;
+
+  // Check if the parser returned null
+  if (handler_mode != nullptr) {
+    // Check if the request handler returned not found
+    status = handler_mode->HandleRequest(req, &res);
+    if (status == RequestHandler::Status::NOT_FOUND){
+      // Call the default/not found handler
+      handlers_["default"]->HandleRequest(req, &res);
+    }
+
+    ServerMonitor::getInstance()->addRequest(req.uri(), res.GetStatus());
+    // Write back to the client
+    write_response();
+  }
+  // Return the request
+  return status;
+}
+
 // Write response to the client
 void connection::write_response()
 {
   auto self(shared_from_this());
-  boost::asio::async_write(socket_, boost::asio::buffer(rep.ToString()),
+  boost::asio::async_write(socket_, boost::asio::buffer(res.ToString()),
       [this, self](boost::system::error_code ec, std::size_t)
       {
         if (!ec)

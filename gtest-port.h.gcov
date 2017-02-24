@@ -1,8 +1,5 @@
         -:    0:Source:ngnix/googletest/googletest/include/gtest/internal/gtest-port.h
-        -:    0:Graph:request_parser_test.gcno
-        -:    0:Data:request_parser_test.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Programs:7
         -:    1:// Copyright 2005, Google Inc.
         -:    2:// All rights reserved.
         -:    3://
@@ -1131,8 +1128,8 @@
         -: 1126: public:
         -: 1127:  typedef T element_type;
         -: 1128:
-       12: 1129:  explicit scoped_ptr(T* p = NULL) : ptr_(p) {}
-       60: 1130:  ~scoped_ptr() { reset(); }
+        -: 1129:  explicit scoped_ptr(T* p = NULL) : ptr_(p) {}
+    #####: 1130:  ~scoped_ptr() { reset(); }
         -: 1131:
         -: 1132:  T& operator*() const { return *ptr_; }
     #####: 1133:  T* operator->() const { return ptr_; }
@@ -1144,14 +1141,14 @@
         -: 1139:    return ptr;
         -: 1140:  }
         -: 1141:
-       60: 1142:  void reset(T* p = NULL) {
-       60: 1143:    if (p != ptr_) {
-       48: 1144:      if (IsTrue(sizeof(T) > 0)) {  // Makes sure T is a complete type.
-       48: 1145:        delete ptr_;
+    #####: 1142:  void reset(T* p = NULL) {
+    #####: 1143:    if (p != ptr_) {
+    #####: 1144:      if (IsTrue(sizeof(T) > 0)) {  // Makes sure T is a complete type.
+    #####: 1145:        delete ptr_;
         -: 1146:      }
-       48: 1147:      ptr_ = p;
+    #####: 1147:      ptr_ = p;
         -: 1148:    }
-       60: 1149:  }
+    #####: 1149:  }
         -: 1150:
         -: 1151:  friend void swap(scoped_ptr& a, scoped_ptr& b) {
         -: 1152:    using std::swap;

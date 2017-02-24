@@ -1,8 +1,5 @@
         -:    0:Source:ngnix/googletest/googletest/include/gtest/gtest-printers.h
-        -:    0:Graph:request_parser_test.gcno
-        -:    0:Data:request_parser_test.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Programs:7
         -:    1:// Copyright 2007, Google Inc.
         -:    2:// All rights reserved.
         -:    3://
@@ -286,8 +283,8 @@
         -:  281:template <typename ToPrint, size_t N, typename OtherOperand>
         -:  282:class FormatForComparison<ToPrint[N], OtherOperand> {
         -:  283: public:
-    #####:  284:  static ::std::string Format(const ToPrint* value) {
-    #####:  285:    return FormatForComparison<const ToPrint*, OtherOperand>::Format(value);
+        -:  284:  static ::std::string Format(const ToPrint* value) {
+        -:  285:    return FormatForComparison<const ToPrint*, OtherOperand>::Format(value);
         -:  286:  }
         -:  287:};
         -:  288:
@@ -323,7 +320,7 @@
         -:  318:  }
         -:  319:
         -:  320:GTEST_IMPL_FORMAT_C_STRING_AS_STRING_(char, ::std::string);
-    #####:  321:GTEST_IMPL_FORMAT_C_STRING_AS_STRING_(const char, ::std::string);
+        -:  321:GTEST_IMPL_FORMAT_C_STRING_AS_STRING_(const char, ::std::string);
         -:  322:
         -:  323:#if GTEST_HAS_GLOBAL_STRING
         -:  324:GTEST_IMPL_FORMAT_C_STRING_AS_STRING_(char, ::string);
@@ -567,9 +564,9 @@
         -:  562:#endif  // GTEST_HAS_GLOBAL_STRING
         -:  563:
         -:  564:GTEST_API_ void PrintStringTo(const ::std::string&s, ::std::ostream* os);
-    #####:  565:inline void PrintTo(const ::std::string& s, ::std::ostream* os) {
-    #####:  566:  PrintStringTo(s, os);
-    #####:  567:}
+        -:  565:inline void PrintTo(const ::std::string& s, ::std::ostream* os) {
+        -:  566:  PrintStringTo(s, os);
+        -:  567:}
         -:  568:
         -:  569:// Overloads for ::wstring and ::std::wstring.
         -:  570:#if GTEST_HAS_GLOBAL_WSTRING
@@ -806,13 +803,13 @@
         -:  801:template <>
         -:  802:class UniversalTersePrinter<const char*> {
         -:  803: public:
-    #####:  804:  static void Print(const char* str, ::std::ostream* os) {
-    #####:  805:    if (str == NULL) {
-    #####:  806:      *os << "NULL";
+        -:  804:  static void Print(const char* str, ::std::ostream* os) {
+        -:  805:    if (str == NULL) {
+        -:  806:      *os << "NULL";
         -:  807:    } else {
-    #####:  808:      UniversalPrint(string(str), os);
+        -:  808:      UniversalPrint(string(str), os);
         -:  809:    }
-    #####:  810:  }
+        -:  810:  }
         -:  811:};
         -:  812:template <>
         -:  813:class UniversalTersePrinter<char*> {

@@ -1,5 +1,5 @@
         -:    0:Source:request_handler_status.h
-        -:    0:Programs:4
+        -:    0:Programs:7
         -:    1:#ifndef STATUS_HANDLER_H
         -:    2:#define STATUS_HANDLER_H
         -:    3:
@@ -11,14 +11,14 @@
         -:    9:
         -:   10:namespace http {
         -:   11:	namespace server {
-        2:   12:		class StatusHandler : public RequestHandler {
+    #####:   12:		class StatusHandler : public RequestHandler {
         -:   13:		public: 
         -:   14:			Status Init(const std::string& uri_prefix, const NginxConfig& config) override;
         -:   15:
         -:   16:  			Status HandleRequest(const Request& request, Response* response) override;
         -:   17:		};
         -:   18:
-        2:   19:		REGISTER_REQUEST_HANDLER(StatusHandler);
+        1:   19:		REGISTER_REQUEST_HANDLER(StatusHandler);
         -:   20:	} // namespace server
         -:   21:} // namespace http
         -:   22:

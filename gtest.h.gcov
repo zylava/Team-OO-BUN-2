@@ -1,8 +1,5 @@
         -:    0:Source:ngnix/googletest/googletest/include/gtest/gtest.h
-        -:    0:Graph:request_parser_test.gcno
-        -:    0:Data:request_parser_test.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Programs:7
         -:    1:// Copyright 2005, Google Inc.
         -:    2:// All rights reserved.
         -:    3://
@@ -258,7 +255,7 @@
         -:  253://   Expected: Foo() is even
         -:  254://     Actual: it's 5
         -:  255://
-       12:  256:class GTEST_API_ AssertionResult {
+    #####:  256:class GTEST_API_ AssertionResult {
         -:  257: public:
         -:  258:  // Copy constructor.
         -:  259:  // Used in EXPECT_TRUE/FALSE(assertion_result).
@@ -274,12 +271,12 @@
         -:  269:  // the argument is implicitly convertible to AssertionResult. In that case
         -:  270:  // we want AssertionResult's copy constructor to be used.
         -:  271:  template <typename T>
-       12:  272:  explicit AssertionResult(
+        -:  272:  explicit AssertionResult(
         -:  273:      const T& success,
         -:  274:      typename internal::EnableIf<
         -:  275:          !internal::ImplicitlyConvertible<T, AssertionResult>::value>::type*
         -:  276:          /*enabler*/ = NULL)
-       12:  277:      : success_(success) {}
+        -:  277:      : success_(success) {}
         -:  278:
         -:  279:  GTEST_DISABLE_MSC_WARNINGS_POP_()
         -:  280:
@@ -290,7 +287,7 @@
         -:  285:  }
         -:  286:
         -:  287:  // Returns true iff the assertion succeeded.
-       12:  288:  operator bool() const { return success_; }  // NOLINT
+    #####:  288:  operator bool() const { return success_; }  // NOLINT
         -:  289:
         -:  290:  // Returns the assertion's negation. Used with EXPECT/ASSERT_FALSE.
         -:  291:  AssertionResult operator!() const;
@@ -391,7 +388,7 @@
         -:  386:  // test in test case Foo.  Hence a sub-class can define its own
         -:  387:  // SetUpTestCase() method to shadow the one defined in the super
         -:  388:  // class.
-        1:  389:  static void SetUpTestCase() {}
+    #####:  389:  static void SetUpTestCase() {}
         -:  390:
         -:  391:  // Tears down the stuff shared by all tests in this test case.
         -:  392:  //
@@ -399,7 +396,7 @@
         -:  394:  // test in test case Foo.  Hence a sub-class can define its own
         -:  395:  // TearDownTestCase() method to shadow the one defined in the super
         -:  396:  // class.
-        1:  397:  static void TearDownTestCase() {}
+    #####:  397:  static void TearDownTestCase() {}
         -:  398:
         -:  399:  // Returns true iff the current test has a fatal failure.
         -:  400:  static bool HasFatalFailure();
@@ -1389,13 +1386,13 @@
         -: 1384:
         -: 1385:// The helper function for {ASSERT|EXPECT}_EQ.
         -: 1386:template <typename T1, typename T2>
-       10: 1387:AssertionResult CmpHelperEQ(const char* lhs_expression,
+    #####: 1387:AssertionResult CmpHelperEQ(const char* lhs_expression,
         -: 1388:                            const char* rhs_expression,
         -: 1389:                            const T1& lhs,
         -: 1390:                            const T2& rhs) {
         -: 1391:GTEST_DISABLE_MSC_WARNINGS_PUSH_(4389 /* signed/unsigned mismatch */)
-       10: 1392:  if (lhs == rhs) {
-       10: 1393:    return AssertionSuccess();
+    #####: 1392:  if (lhs == rhs) {
+    #####: 1393:    return AssertionSuccess();
         -: 1394:  }
         -: 1395:GTEST_DISABLE_MSC_WARNINGS_POP_()
         -: 1396:
@@ -1419,11 +1416,11 @@
         -: 1414: public:
         -: 1415:  // This templatized version is for the general case.
         -: 1416:  template <typename T1, typename T2>
-       10: 1417:  static AssertionResult Compare(const char* lhs_expression,
+    #####: 1417:  static AssertionResult Compare(const char* lhs_expression,
         -: 1418:                                 const char* rhs_expression,
         -: 1419:                                 const T1& lhs,
         -: 1420:                                 const T2& rhs) {
-       10: 1421:    return CmpHelperEQ(lhs_expression, rhs_expression, lhs, rhs);
+    #####: 1421:    return CmpHelperEQ(lhs_expression, rhs_expression, lhs, rhs);
         -: 1422:  }
         -: 1423:
         -: 1424:  // With this overloaded version, we allow anonymous enums to be used

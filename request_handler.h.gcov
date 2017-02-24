@@ -1,9 +1,5 @@
         -:    0:Source:request_handler.h
-<<<<<<< HEAD
-        -:    0:Programs:2
-=======
-        -:    0:Programs:4
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
+        -:    0:Programs:7
         -:    1:// For the Request and Response classes, you need to implement the methods
         -:    2:// and add private data as appropriate. You may also need to modify or extend
         -:    3:// the API when implementing the reverse proxy. Use your good judgment.
@@ -23,20 +19,15 @@
         -:   17:namespace http {
         -:   18:  namespace server {
         -:   19:
-    #####:   20:class Request {
+       44:   20:class Request {
         -:   21: public:
         -:   22:  static std::unique_ptr<Request> Parse(const std::string& raw_request);
         -:   23:
         -:   24:  // Getters
         -:   25:  std::string raw_request() const { return m_raw_request; }
         -:   26:  std::string method() const { return m_method; }
-<<<<<<< HEAD
-        -:   27:  std::string uri() const { return m_uri; };
-    #####:   28:  std::string version() const { return m_version; }
-=======
     #####:   27:  std::string uri() const { return m_uri; };
         -:   28:  std::string version() const { return m_version; }
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:   29:
         -:   30:  using Headers = std::vector<std::pair<std::string, std::string>>;
         -:   31:  Headers headers() const { return m_headers; }
@@ -64,7 +55,7 @@
         -:   53://
         -:   54:// Constructed by the RequestHandler, after which the server should call ToString
         -:   55:// to serialize.
-    #####:   56:class Response {
+        1:   56:class Response {
         -:   57: public:
         -:   58:  enum ResponseCode {
         -:   59:    // Define your HTTP response codes here.
@@ -77,11 +68,7 @@
         -:   66:  void AddHeader(const std::string& header_name, const std::string& header_value);
         -:   67:  void SetBody(const std::string& body);
         -:   68:  
-<<<<<<< HEAD
-        -:   69:  void SetVersion(const std::string& version);
-=======
         -:   69:  ResponseCode GetStatus();   
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
         -:   70:
         -:   71:  std::string ToString();
         -:   72:
@@ -130,25 +117,14 @@
         -:  115:template<typename T>
         -:  116:class RequestHandlerRegisterer {
         -:  117: public:
-<<<<<<< HEAD
-        3:  118:  RequestHandlerRegisterer(const std::string& type) {
-        3:  119:    if (request_handler_builders == nullptr) {
-    #####:  120:      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
-        -:  121:    }
-        3:  122:    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
-        3:  123:  }
-        5:  124:  static RequestHandler* Create() {
-        5:  125:    return new T;
-=======
         6:  118:  RequestHandlerRegisterer(const std::string& type) {
         6:  119:    if (request_handler_builders == nullptr) {
     #####:  120:      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
         -:  121:    }
         6:  122:    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
         6:  123:  }
-        6:  124:  static RequestHandler* Create() {
-        6:  125:    return new T;
->>>>>>> 8e43879fcdc339801b935100ba018eeb9d49be6b
+       14:  124:  static RequestHandler* Create() {
+       14:  125:    return new T;
         -:  126:  }
         -:  127:};
         -:  128:
