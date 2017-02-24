@@ -1,20 +1,21 @@
-#include "connection.hpp"
+#include "connection.h"
 #include <utility>
 #include <vector>
 #include <iostream> 
 #include "request_handler.h"
+#include <boost/asio.hpp>
+#include "server_monitor.h"
 
 namespace http {
 namespace server {
 
-connection::connection(boost::asio::ip::tcp::socket socket, request_handler& handler)
-  : socket_(std::move(socket)), request_handler_(handler)
+connection::connection(boost::asio::ip::tcp::socket socket, std::map <std::string, RequestHandler*> handlers)
+  : socket_(std::move(socket)), handlers_(handlers)
 {
 }
 
 void connection::start()
 {
-  connectionStatus = connection::success; 
   do_read();
 }
 
@@ -24,14 +25,9 @@ void connection::stop()
   io_service_.stop();
 }
 
-int connection::getConnectionStatus()
+Response connection::get_response()
 {
-  return connectionStatus; 
-}
-
-reply connection::get_reply()
-{
-  return rep;
+  return res;
 }
 
 void connection::do_read()
@@ -42,58 +38,78 @@ void connection::do_read()
       {
         if (!ec)
         {
-          request_parser::result_type result;
-          std::tie(result, std::ignore) = request_parser_.parse(
-          	req, buffer_.data(), buffer_.data() + bytes_transferred);
+          // Turn the request buffer into a string
+          std::string s = "";
+          s.append(buffer_.data(), buffer_.data() + bytes_transferred);
 
-          // Determine /echo or /static
-          std::string server_mode = parse_command(req);
+          // Create a request object of the parsed object
+          call_parser(s);
 
-          // echo
-          if (result == request_parser::good && server_mode == "echo"){
-          	create_echo_response(buffer_.data(), bytes_transferred);
-            write_response();
+          // Determine the file handler needed
+          RequestHandler* server_mode = find_handler(req);
 
-          } // static 
-          else if (result == request_parser::good)
-          {
-            request_handler_.handle_request(req, rep);
-            write_response(); 
-          }
+          // Call the request handler that matches the request
+          call_handler(server_mode);
         }
       });
 }
 
-// Determines whether the input URL is /echo or /static
-std::string connection::parse_command(request req)
+// Parse the input buffer into a pointer to a request object
+Request connection::call_parser(std::string s)
 {
-	std::string mode;
-	std::size_t first_slash_pos = req.uri.find_first_of("/"); 
-	for(char& c : req.uri.substr(first_slash_pos + 1)) {
-		if (c == '/'){
-		 	break; 
-		} 
-		mode += c;
-	}
-	return mode;
+  // Parse the request
+  req = *(Request::Parse(s));
+  return req;
+} 
+
+// Determines which handler the input uri should use
+RequestHandler* connection::find_handler(Request& req)
+{
+	std::string mode = req.uri();
+
+  // Go backward from the end of the uri
+  for (int index = mode.length(); index > 0; index--) {
+    // Update the size of the uri string 
+    mode.resize(index);
+
+    // Find longest matching path in the handlers
+    if (handlers_.find(mode) != handlers_.end()) {
+      // Found: return pointer to the handler
+      RequestHandler* handler = handlers_[mode];
+      return handler;
+    }
+  }
+  // No matching handler found, return nullptr
+  return nullptr;
 }
 
-// Reads in the buffer_ data and constructs a reply with the proper echo headers and body
-void connection::create_echo_response(const char* data, std::size_t bytes_transferred)
+// Call the handler that is associated with the current request
+RequestHandler::Status connection::call_handler(RequestHandler* handler_mode)
 {
-	rep.content.append(data, bytes_transferred);
-    rep.headers.resize(2);
-    rep.headers[0].name = "Content-Length";
-    rep.headers[0].value = std::to_string(rep.content.size());
-    rep.headers[1].name = "Content-Type";
-    rep.headers[1].value = "text/plain";
-    rep.status = reply::ok;	
+  RequestHandler::Status status;
+
+  // Check if the parser returned null
+  if (handler_mode != nullptr) {
+    // Check if the request handler returned not found
+    status = handler_mode->HandleRequest(req, &res);
+    if (status == RequestHandler::Status::NOT_FOUND){
+      // Call the default/not found handler
+      handlers_["default"]->HandleRequest(req, &res);
+    }
+
+    ServerMonitor::getInstance()->addRequest(req.uri(), res.GetStatus());
+    // Write back to the client
+    write_response();
+  }
+  // Return the request
+  return status;
 }
 
+// Write response to the client
 void connection::write_response()
 {
   auto self(shared_from_this());
-  boost::asio::async_write(socket_, rep.to_buffers(),
+  boost::asio::async_write(socket_, boost::asio::buffer(res.ToString()),
       [this, self](boost::system::error_code ec, std::size_t)
       {
         if (!ec)

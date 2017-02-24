@@ -204,7 +204,7 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
     } else if (token_type == TOKEN_TYPE_END_BLOCK) {
       if (last_token_type != TOKEN_TYPE_STATEMENT_END) {
         // Error.
-        break;
+        // break;
       }
       incomplete_blocks--;
       config_stack.pop();

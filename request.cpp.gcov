@@ -1,0 +1,65 @@
+        -:    0:Source:request.cpp
+        -:    0:Programs:7
+        -:    1:#include "request_handler.h" 
+        -:    2:#include <sstream>
+        -:    3:
+        -:    4:namespace http {
+        -:    5:namespace server {
+        -:    6:
+       11:    7:std::unique_ptr<Request> Request::Parse(const std::string& raw_request) {
+        -:    8:    // Create a new request object 
+       11:    9:    std::unique_ptr<Request> new_request = std::unique_ptr<Request>(new Request());
+        -:   10:    // Set the raw request object
+       11:   11:    new_request->m_raw_request = raw_request;
+        -:   12:
+        -:   13:    // Use a string stream to read lines in from the request
+       22:   14:    std::stringstream stream;
+       11:   15:    stream << raw_request;
+       22:   16:    std::vector<std::string> request_lines;
+        -:   17:
+        -:   18:    // Read only if the raw request is not empty
+       11:   19:    if (!raw_request.empty()) {
+       67:   20:      for (std::string line; std::getline(stream, line, '\n'); ) {
+       45:   21:          request_lines.push_back(line);
+       11:   22:      }
+        -:   23:    }
+        -:   24:
+        -:   25:    // Parse all the lines of the request into their proper member variables
+       56:   26:    for (int i = 0; i < (int) request_lines.size(); i++) {
+       45:   27:        if (i == 0) {
+        -:   28:          // The first line contains the method, uri, and version separated by spaces
+       11:   29:          auto find_method = request_lines[i].find(" ");
+       11:   30:          new_request->m_method = request_lines[i].substr(0, find_method);
+        -:   31:          
+        -:   32:          // The GET/POST method is followed by a space
+       11:   33:          std::string rest_of_first_line = request_lines[i].substr(find_method + 1);
+        -:   34:
+        -:   35:          // The uri immediately follows the method and a space
+       11:   36:          auto find_uri = rest_of_first_line.find(" ");
+       11:   37:          new_request->m_uri = rest_of_first_line.substr(0, find_uri);
+        -:   38:
+        -:   39:          // The version is the rest of the first line
+       11:   40:          new_request->m_version = rest_of_first_line.substr(find_uri + 1, rest_of_first_line.length() - 1);
+        -:   41:        } 
+       34:   42:        else if (!request_lines.empty()) {
+        -:   43:          // The rest of the request contains a header name, a colon, a space, and its values
+       34:   44:          std::size_t colon = request_lines[i].find_first_of(":");
+        -:   45:
+       34:   46:          if (colon != std::string::npos) {
+       27:   47:            std::string header_name = request_lines[i].substr(0, colon);
+        -:   48:
+        -:   49:            // The values immediate follow a colon and a space
+       54:   50:            std::string header_value = request_lines[i].substr(colon + 2);
+       54:   51:            new_request->m_headers.push_back(std::make_pair(header_name, header_value.substr(0, header_value.length() - 1)));
+        -:   52:          }
+        -:   53:        } 
+        -:   54:        else {
+        -:   55:          // The rest of the request is the body of the request
+    #####:   56:          new_request->m_body += request_lines[i];
+        -:   57:        }
+        -:   58:    }
+       22:   59:    return new_request;
+        -:   60:  }
+        -:   61:
+        -:   62:} // namespace server
+        3:   63:} // namespace http

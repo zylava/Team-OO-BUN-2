@@ -1,8 +1,5 @@
         -:    0:Source:ngnix/googletest/googletest/include/gtest/internal/gtest-internal.h
-        -:    0:Graph:request_parser_test.gcno
-        -:    0:Data:request_parser_test.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Programs:7
         -:    1:// Copyright 2005, Google Inc.
         -:    2:// All rights reserved.
         -:    3://
@@ -449,12 +446,12 @@
         -:  444:// returned for different types.  Calling the function twice with the
         -:  445:// same type argument is guaranteed to return the same ID.
         -:  446:template <typename T>
-        6:  447:TypeId GetTypeId() {
+        -:  447:TypeId GetTypeId() {
         -:  448:  // The compiler is required to allocate a different
         -:  449:  // TypeIdHelper<T>::dummy_ variable for each T used to instantiate
         -:  450:  // the template.  Therefore, the address of dummy_ is guaranteed to
         -:  451:  // be unique.
-        6:  452:  return &(TypeIdHelper<T>::dummy_);
+        -:  452:  return &(TypeIdHelper<T>::dummy_);
         -:  453:}
         -:  454:
         -:  455:// Returns the type ID of ::testing::Test.  Always call this instead
@@ -468,14 +465,14 @@
         -:  463:// of a Test object.
         -:  464:class TestFactoryBase {
         -:  465: public:
-        6:  466:  virtual ~TestFactoryBase() {}
+    #####:  466:  virtual ~TestFactoryBase() {}
         -:  467:
         -:  468:  // Creates a test instance to run. The instance is both created and destroyed
         -:  469:  // within TestInfoImpl::Run()
         -:  470:  virtual Test* CreateTest() = 0;
         -:  471:
         -:  472: protected:
-        6:  473:  TestFactoryBase() {}
+    #####:  473:  TestFactoryBase() {}
         -:  474:
         -:  475: private:
         -:  476:  GTEST_DISALLOW_COPY_AND_ASSIGN_(TestFactoryBase);
@@ -484,9 +481,9 @@
         -:  479:// This class provides implementation of TeastFactoryBase interface.
         -:  480:// It is used in TEST and TEST_F macros.
         -:  481:template <class TestClass>
-       18:  482:class TestFactoryImpl : public TestFactoryBase {
+        6:  482:class TestFactoryImpl : public TestFactoryBase {
         -:  483: public:
-        6:  484:  virtual Test* CreateTest() { return new TestClass; }
+        2:  484:  virtual Test* CreateTest() { return new TestClass; }
         -:  485:};
         -:  486:
         -:  487:#if GTEST_OS_WINDOWS
@@ -506,8 +503,8 @@
         -:  501:typedef void (*SetUpTestCaseFunc)();
         -:  502:typedef void (*TearDownTestCaseFunc)();
         -:  503:
-       18:  504:struct CodeLocation {
-        6:  505:  CodeLocation(const string& a_file, int a_line) : file(a_file), line(a_line) {}
+    #####:  504:struct CodeLocation {
+    #####:  505:  CodeLocation(const string& a_file, int a_line) : file(a_file), line(a_line) {}
         -:  506:
         -:  507:  string file;
         -:  508:  int line;

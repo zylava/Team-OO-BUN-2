@@ -1,0 +1,63 @@
+        -:    0:Source:connection.h
+        -:    0:Programs:7
+        -:    1:#ifndef CONNECTION_H
+        -:    2:#define CONNECTION_H
+        -:    3:
+        -:    4:#include <array>
+        -:    5:#include <memory>
+        -:    6:#include <boost/asio.hpp>
+        -:    7:#include <string>
+        -:    8:#include "request_handler.h"
+        -:    9:#include <map>
+        -:   10:
+        -:   11:namespace http {
+        -:   12:namespace server {
+        -:   13:
+        -:   14:// 8192 is maximum size of a package sent on a network
+        -:   15:static const int MAX_BUFFER_SIZE = 8192;
+        -:   16:
+        2:   17:class connection : public std::enable_shared_from_this<connection>
+        -:   18:{
+        -:   19:public:
+        -:   20:  // Does not allow us to make copies of this class
+        -:   21:  // connection(const connection&) = delete;
+        -:   22:  // connection& operator=(const connection&) = delete;
+        -:   23:
+        -:   24:  explicit connection(boost::asio::ip::tcp::socket socket, std::map <std::string, RequestHandler*> handlers);
+        -:   25:
+        -:   26:  void start();
+        -:   27:  
+        -:   28:  void stop();
+        -:   29:
+        -:   30:  Response get_response();
+        -:   31:
+        -:   32:  void write_response();
+        -:   33:
+        -:   34:  Request call_parser(std::string data);
+        -:   35:
+        -:   36:  RequestHandler* find_handler(Request& request);
+        -:   37:
+        -:   38:  RequestHandler::Status call_handler(RequestHandler* handler_mode);
+        -:   39:  
+        -:   40:private:
+        -:   41:  void do_read();
+        -:   42:
+        -:   43:  boost::asio::io_service io_service_;
+        -:   44:
+        -:   45:  boost::asio::ip::tcp::socket socket_;
+        -:   46:
+        -:   47:  std::array<char, MAX_BUFFER_SIZE> buffer_;
+        -:   48:
+        -:   49:  Response res; 
+        -:   50:
+        -:   51:  Request req; 
+        -:   52:
+        -:   53:  /// The handler used to process the incoming request.
+        -:   54:  std::map <std::string, RequestHandler*> handlers_;
+        -:   55:
+        -:   56:};
+        -:   57:
+        -:   58:} // namespace server
+        -:   59:} // namespace http
+        -:   60:
+        -:   61:#endif // HTTP_CONNECTION_HPP

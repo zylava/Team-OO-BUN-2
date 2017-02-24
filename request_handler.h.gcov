@@ -1,0 +1,138 @@
+        -:    0:Source:request_handler.h
+        -:    0:Programs:7
+        -:    1:// For the Request and Response classes, you need to implement the methods
+        -:    2:// and add private data as appropriate. You may also need to modify or extend
+        -:    3:// the API when implementing the reverse proxy. Use your good judgment.
+        -:    4:#ifndef REQUEST_HANDLER_H
+        -:    5:#define REQUEST_HANDLER_H
+        -:    6:
+        -:    7:#include <map>
+        -:    8:#include <memory>
+        -:    9:#include <string>
+        -:   10:#include "ngnix/config_parser.h"
+        -:   11:
+        -:   12:// Represents an HTTP Request.
+        -:   13://
+        -:   14:// Usage:
+        -:   15://   auto request = Request::Parse(raw_request);
+        -:   16:
+        -:   17:namespace http {
+        -:   18:  namespace server {
+        -:   19:
+       44:   20:class Request {
+        -:   21: public:
+        -:   22:  static std::unique_ptr<Request> Parse(const std::string& raw_request);
+        -:   23:
+        -:   24:  // Getters
+        -:   25:  std::string raw_request() const { return m_raw_request; }
+        -:   26:  std::string method() const { return m_method; }
+    #####:   27:  std::string uri() const { return m_uri; };
+        -:   28:  std::string version() const { return m_version; }
+        -:   29:
+        -:   30:  using Headers = std::vector<std::pair<std::string, std::string>>;
+        -:   31:  Headers headers() const { return m_headers; }
+        -:   32:
+        -:   33:  std::string body() const { return m_body; }
+        -:   34:
+        -:   35: private:
+        -:   36:  std::string m_raw_request;
+        -:   37:  std::string m_method;
+        -:   38:  std::string m_uri;
+        -:   39:  std::string m_version;
+        -:   40:  std::string m_body;
+        -:   41:
+        -:   42:  Headers m_headers;
+        -:   43:
+        -:   44:};
+        -:   45:
+        -:   46:// Represents an HTTP response.
+        -:   47://
+        -:   48:// Usage:
+        -:   49://   Response r;
+        -:   50://   r.SetStatus(RESPONSE_200);
+        -:   51://   r.SetBody(...);
+        -:   52://   return r.ToString();
+        -:   53://
+        -:   54:// Constructed by the RequestHandler, after which the server should call ToString
+        -:   55:// to serialize.
+        1:   56:class Response {
+        -:   57: public:
+        -:   58:  enum ResponseCode {
+        -:   59:    // Define your HTTP response codes here.
+        -:   60:    OK = 200,
+        -:   61:    BAD_REQUEST = 400,
+        -:   62:    NOT_FOUND = 404
+        -:   63:  };
+        -:   64:  
+        -:   65:  void SetStatus(const ResponseCode response_code);
+        -:   66:  void AddHeader(const std::string& header_name, const std::string& header_value);
+        -:   67:  void SetBody(const std::string& body);
+        -:   68:  
+        -:   69:  ResponseCode GetStatus();   
+        -:   70:
+        -:   71:  std::string ToString();
+        -:   72:
+        -:   73:  private:
+        -:   74:    ResponseCode responseStatus; 
+        -:   75:    std::string content; 
+        -:   76:    std::vector<std::pair<std::string, std::string>> mHeaders;
+        -:   77:    std::string mVersion;
+        -:   78:};
+        -:   79:
+        -:   80:// Represents the parent of all request handlers. Implementations should expect to
+        -:   81:// be long lived and created at server constrution.
+    #####:   82:class RequestHandler {
+        -:   83: public:
+        -:   84:  enum Status {
+        -:   85:    OK = 0,
+        -:   86:    BAD_REQUEST = 1,
+        -:   87:    NOT_FOUND = 2
+        -:   88:    // Define your status codes here.
+        -:   89:  };
+        -:   90:  
+        -:   91:  // Initializes the handler. Returns a response code indicating success or
+        -:   92:  // failure condition.
+        -:   93:  // uri_prefix is the value in the config file that this handler will run for.
+        -:   94:  // config is the contents of the child block for this handler ONLY.
+        -:   95:  virtual Status Init(const std::string& uri_prefix,
+        -:   96:                      const NginxConfig& config) = 0;
+        -:   97:
+        -:   98:  // Handles an HTTP request, and generates a response. Returns a response code
+        -:   99:  // indicating success or failure condition. If ResponseCode is not OK, the
+        -:  100:  // contents of the response object are undefined, and the server will return
+        -:  101:  // HTTP code 500.
+        -:  102:  virtual Status HandleRequest(const Request& request,
+        -:  103:                               Response* response) = 0;
+        -:  104:
+        -:  105:  static RequestHandler* CreateByName(const char* type);
+        -:  106:
+        -:  107:  // private:
+        -:  108:    std::string mUri_prefix;
+        -:  109:    std::string mPath; 
+        -:  110:    std::string mHandlerName; 
+        -:  111:    std::string mRoot;  
+        -:  112:};
+        -:  113:
+        -:  114:extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
+        -:  115:template<typename T>
+        -:  116:class RequestHandlerRegisterer {
+        -:  117: public:
+        6:  118:  RequestHandlerRegisterer(const std::string& type) {
+        6:  119:    if (request_handler_builders == nullptr) {
+    #####:  120:      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
+        -:  121:    }
+        6:  122:    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
+        6:  123:  }
+       14:  124:  static RequestHandler* Create() {
+       14:  125:    return new T;
+        -:  126:  }
+        -:  127:};
+        -:  128:
+        -:  129:
+        -:  130:#define REGISTER_REQUEST_HANDLER(ClassName) \
+        -:  131:  static RequestHandlerRegisterer<ClassName> ClassName##__registerer(#ClassName)
+        -:  132:  
+        -:  133:} // namespace server
+        -:  134:} // namespace http
+        -:  135:
+        -:  136:#endif  // REQUEST_HANDLER_H

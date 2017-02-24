@@ -31,7 +31,7 @@
         3:   29:  void request_handler::handle_request(const request& req, reply& rep)
         -:   30:  {
         -:   31:    // Decode url to path.
-        4:   32:    std::string request_path;
+        3:   32:    std::string request_path;
         -:   33:
         3:   34:    if (!url_decode(req.uri, request_path))
         -:   35:    {
@@ -99,7 +99,7 @@
         1:   97:    rep.headers[0].name = "Content-Length";
         1:   98:    rep.headers[0].value = std::to_string(rep.content.size());
         1:   99:    rep.headers[1].name = "Content-Type";
-        1:  100:    rep.headers[1].value = mime_types::extension_to_type(extension);
+        2:  100:    rep.headers[1].value = mime_types::extension_to_type(extension);
         -:  101:  }
         -:  102:
         3:  103:  bool request_handler::url_decode(const std::string& in, std::string& out)
@@ -122,7 +122,7 @@
         -:  120:          else
         -:  121:          {
     #####:  122:            return false;
-        -:  123:          }
+    #####:  123:          }
         -:  124:        }
         -:  125:        else
         -:  126:        {
