@@ -35,6 +35,7 @@ test: ngnix/config_parser.cc server_monitor.cpp \
 	-std=c++0x -g -Wall -lboost_regex -lboost_system -fprofile-arcs -ftest-coverage -lpthread -o mytest
 	./mytest
 	gcov -r server.cpp connection.cpp request.cpp response.cpp request_handler_status.cpp request_handler_default.cpp request_handler_static.cpp server_monitor.cpp
+	rm *.gcov *.gcda *.gcno
 
 # gcov: server_test.cc connection_test.cc server.cpp ${GTEST_DIR}/src/gtest-all.cc connection.cpp ${GTEST_DIR}/src/gtest_main.cc ${GMOCK_DIR}/src/gmock-all.cc
 # 	g++ server_test.cc connection_test.cc server.cpp -isystem ${GTEST_DIR}/include \
