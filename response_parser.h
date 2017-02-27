@@ -1,14 +1,15 @@
 #ifndef RESPONSE_PARSER_H
 #define RESPONSE_PARSER_H
 
+#include <string>
 
 //this class only parses the headers of a response
 //once we get the content-length, the payload can be gathered after!
 
 class ResponseParser{
 public:
-	
-	ReponseParser(){
+
+	ResponseParser(){
 		redirect_url = "";
 	}
 
@@ -27,6 +28,6 @@ private:
 	std::string find_response_code(std::string response);
 	//finds the value for a header no matter the header, and returns that value as a string
 	std::string find_header_value(std::string header, std::string response);
-}
+};
 
 #endif

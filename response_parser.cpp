@@ -1,5 +1,7 @@
 #include "response_parser.h"
 #include <stdlib.h>
+#include <string>
+#include <algorithm>
 
 int ResponseParser::parse_response(std::string response){
 
@@ -8,7 +10,7 @@ int ResponseParser::parse_response(std::string response){
 
 	std::string r_code = find_response_code(response);
 	if (r_code != "" && is_a_number(r_code))
-		response_code = atoi(r_code);
+		response_code = atoi(r_code.c_str());
 	else
 		return -1;
 
@@ -17,7 +19,7 @@ int ResponseParser::parse_response(std::string response){
 	if (c_length != "")
 		content_length = 0;
 	else if (is_a_number(c_length))
-		content_length = atoi(c_length);
+		content_length = atoi(c_length.c_str());
 	else
 		return -1;
 
@@ -30,13 +32,16 @@ int ResponseParser::parse_response(std::string response){
 
 bool ResponseParser::is_a_number(const std::string s){
 	if (s == "") return false;
-  	return s.find_first_not_of( "0123456789" ) == string::npos;
+
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it)) ++it;
+    return !s.empty() && it == s.end();
 }
 
-std::string ReponseParser::find_response_code(std::string response){
+std::string ResponseParser::find_response_code(std::string response){
 	int first_space = response.find(" ");
   	std::string r_code = response.substr(first_space + 1, response.find(" ", first_space + 1) - first_space);
-  	r_code.erase(remove_if(r_code.begin(), r_code.end(), isspace), str.end());
+  	r_code.erase(remove_if(r_code.begin(), r_code.end(), ::isspace), r_code.end());
   	return r_code;
 }
 
@@ -44,10 +49,10 @@ std::string ResponseParser::find_header_value(std::string header_name, std::stri
   	std::string content_length_constant = header_name;
   	size_t pos = response.find(content_length_constant);
 
-  	if (pos == string::npos)
+  	if (pos == std::string::npos)
     	return "";
 
-    std::string header_value = ""
+    std::string header_value = "";
     //start from the end of the header constant part and gather the value
   	for (size_t i=pos + content_length_constant.size(); response[i] != '\r'; i++) {
   		if (i == response.size()-1)
