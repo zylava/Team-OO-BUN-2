@@ -1,10 +1,11 @@
 #include "response_parser.h"
+#include <stdlib.h>
 
 int ResponseParser::parse_response(std::string response){
 
 	if (response.length() == 0)
 		return -1;
-	
+
 	std::string r_code = find_response_code(response);
 	if (r_code != "" && is_a_number(r_code))
 		response_code = atoi(r_code);
@@ -22,7 +23,10 @@ int ResponseParser::parse_response(std::string response){
 
 	redirect_url = find_header_value("Location: ", response);
 
+	return 0;
+
 }
+
 
 bool ResponseParser::is_a_number(const std::string s){
 	if (s == "") return false;
@@ -44,7 +48,7 @@ std::string ResponseParser::find_header_value(std::string header_name, std::stri
     	return "";
 
     std::string header_value = ""
-
+    //start from the end of the header constant part and gather the value
   	for (size_t i=pos + content_length_constant.size(); response[i] != '\r'; i++) {
   		if (i == response.size()-1)
   			return "";
