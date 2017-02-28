@@ -6,7 +6,7 @@ all: echo_server
 echo_server: main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp \
 	request_handler_default.cpp request_handler_status.cpp server.cpp connection.cpp 
 	g++ main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp \
-	request_handler_default.cpp request_handler_status.cpp server.cpp connection.cpp \
+	request_handler_default.cpp request_handler_status.cpp server.cpp connection.cpp response_parser.cpp \
 	-std=c++0x -g -Wall -lboost_regex -lboost_system -lpthread -o webserver
 
 
@@ -34,7 +34,7 @@ test: ngnix/config_parser.cc server_monitor.cpp \
 	-isystem ${GMOCK_DIR}/include -I${GMOCK_DIR} ${GMOCK_DIR}/src/gmock-all.cc \
 	-std=c++0x -g -Wall -lboost_regex -lboost_system -fprofile-arcs -ftest-coverage -lpthread -o mytest
 	./mytest
-	gcov -r server.cpp connection.cpp request.cpp response.cpp request_handler_status.cpp request_handler_default.cpp request_handler_static.cpp server_monitor.cpp
+	gcov -r server.cpp connection.cpp request.cpp response.cpp request_handler_status.cpp request_handler_default.cpp request_handler_static.cpp server_monitor.cpp response_parser_test.cpp
 	rm *.gcov *.gcda *.gcno
 
 # gcov: server_test.cc connection_test.cc server.cpp ${GTEST_DIR}/src/gtest-all.cc connection.cpp ${GTEST_DIR}/src/gtest_main.cc ${GMOCK_DIR}/src/gmock-all.cc
