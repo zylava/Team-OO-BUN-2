@@ -4,4 +4,12 @@ path / StaticHandler {
    root static;
 }
 path /echo EchoHandler {}
+
+path /proxy ProxyHandler {
+    url ucla.edu;
+}
+
 default NotFoundHandler {}
+
+
+

@@ -3,10 +3,12 @@ GMOCK_DIR=ngnix/googletest/googlemock
 
 all: echo_server
 
-echo_server: main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp \
+echo_server: main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp proxy_handler.cpp\
 	request_handler_default.cpp request_handler_status.cpp server.cpp connection.cpp 
 	g++ main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp \
-	request_handler_default.cpp request_handler_status.cpp server.cpp connection.cpp \
+	request_handler_default.cpp \
+proxy_handler.cpp \
+request_handler_status.cpp server.cpp connection.cpp \
 	-std=c++0x -g -Wall -lboost_regex -lboost_system -lpthread -o webserver
 
 
@@ -28,7 +30,6 @@ test: ngnix/config_parser.cc server_monitor.cpp \
 	request_handler_echo.cpp request_handler_echo_test.cpp \
 	request_handler_static.cpp request_handler_static_test.cpp \
 	request_handler_default.cpp request_handler_default_test.cpp \
-	request_handler_status.cpp request_handler_status_test.cpp \
 	server.cpp server_test.cpp connection.cpp connection_test.cpp \
 	-isystem ${GTEST_DIR}/include -I${GTEST_DIR} ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc \
 	-isystem ${GMOCK_DIR}/include -I${GMOCK_DIR} ${GMOCK_DIR}/src/gmock-all.cc \

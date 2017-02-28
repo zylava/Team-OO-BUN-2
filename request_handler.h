@@ -59,7 +59,8 @@ class Response {
     // Define your HTTP response codes here.
     OK = 200,
     BAD_REQUEST = 400,
-    NOT_FOUND = 404
+    NOT_FOUND = 404,
+    REDIRECT = 302
   };
   
   void SetStatus(const ResponseCode response_code);
@@ -108,7 +109,8 @@ class RequestHandler {
     std::string mUri_prefix;
     std::string mPath; 
     std::string mHandlerName; 
-    std::string mRoot;  
+    std::string mRoot;
+    std::string mURL;  
 };
 
 extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;

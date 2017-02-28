@@ -1,0 +1,13 @@
+port 3030;
+
+path /proxy ProxyHandler {
+    url 127.0.0.1:2020
+}
+
+path /static StaticHandler {
+   root static1;
+}
+path /echo EchoHandler {}
+
+default NotFoundHandler {}
+

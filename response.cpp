@@ -34,6 +34,9 @@ namespace http {
 					break;
 				case NOT_FOUND:
 					responseString += "HTTP/1.1 404 Not Found\r\n";
+				case REDIRECT:
+					responseString +=
+"HTTP/1.1 302 Found\r\n";
 					break;
 			}
 

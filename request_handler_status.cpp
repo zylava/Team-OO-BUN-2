@@ -32,6 +32,9 @@ namespace server {
 			case Response::NOT_FOUND:
 				responseString += "404";
 				break;
+			case Response::REDIRECT:
+				responseString += "302";
+				break;
 		  }
 
   		  body += iterator->first + " " +  responseString + "<br>"; 
