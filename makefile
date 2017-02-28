@@ -6,6 +6,7 @@ all: echo_server
 echo_server: main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp proxy_handler.cpp\
 	request_handler_default.cpp request_handler_status.cpp server.cpp connection.cpp 
 	g++ main.cpp ngnix/config_parser.cc server_monitor.cpp response.cpp request.cpp request_handler.cpp request_handler_echo.cpp request_handler_static.cpp \
+
 	request_handler_default.cpp \
 proxy_handler.cpp \
 request_handler_status.cpp server.cpp connection.cpp \
