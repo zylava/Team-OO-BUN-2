@@ -16,7 +16,7 @@ int ResponseParser::parse_response(std::string response){
 
 	//if c_length isnt found, set c_length to equal 0;
 	std::string c_length = find_header_value("Content-Length: ", response);
-	if (c_length != "")
+	if (c_length == "")
 		content_length = 0;
 	else if (is_a_number(c_length))
 		content_length = atoi(c_length.c_str());
