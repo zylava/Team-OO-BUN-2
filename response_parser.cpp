@@ -46,15 +46,14 @@ std::string ResponseParser::find_response_code(std::string response){
 }
 
 std::string ResponseParser::find_header_value(std::string header_name, std::string response){
-  	std::string content_length_constant = header_name;
-  	size_t pos = response.find(content_length_constant);
+  	size_t pos = response.find(header_name);
 
   	if (pos == std::string::npos)
     	return "";
 
     std::string header_value = "";
     //start from the end of the header constant part and gather the value
-  	for (size_t i=pos + content_length_constant.size(); response[i] != '\r'; i++) {
+  	for (size_t i=pos + header_name.size(); response[i] != '\r'; i++) {
   		if (i == response.size()-1)
   			return "";
    		header_value += response[i];
